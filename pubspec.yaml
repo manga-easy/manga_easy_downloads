@@ -1,0 +1,23 @@
+name: manga_easy_downloads
+description: Micro app de downloads do manga easy.
+version: 0.0.1
+homepage:
+
+environment:
+  sdk: '>=3.0.1 <4.0.0'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  custom_lint: 0.4.0
+  manga_easy_lint_rules:
+    git:
+      url: https://github.com/manga-easy/manga_easy_lint_rules.git
+      ref: v1.0.1
+flutter:
