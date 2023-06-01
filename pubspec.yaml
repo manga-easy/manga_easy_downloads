@@ -2,14 +2,40 @@ name: manga_easy_downloads
 description: Micro app de downloads do manga easy.
 version: 0.0.1
 homepage:
+publish_to: none
 
 environment:
-  sdk: '>=3.0.1 <4.0.0'
-  flutter: ">=1.17.0"
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   flutter:
     sdk: flutter
+  manga_easy_sdk:
+    git:
+      url: https://github.com/manga-easy/manga_easy_sdk.git
+      ref: v1.2.1
+  coffee_cup:
+    git:
+      url: https://github.com/manga-easy/manga_easy_coffee_cup.git
+      ref: v1.1.0
+  client_driver:
+    git:
+      url: https://github.com/manga-easy/manga_easy_client_driver.git
+      ref: v1.1.1
+  manga_easy_themes:
+    git:
+      url: https://github.com/manga-easy/manga_easy_themes.git
+      ref: 1.0.2
+  manga_easy_routes:
+    git:
+      url: https://github.com/manga-easy/manga_easy_routes.git
+      ref: v1.0.1
+  manga_easy_persistent_database_service:
+    git: 
+      url: https://github.com/manga-easy/manga_easy_persistent_database_service.git
+      ref: v1.0.0
+  
+  get_it: ^7.2.0
 
 dev_dependencies:
   flutter_test:
