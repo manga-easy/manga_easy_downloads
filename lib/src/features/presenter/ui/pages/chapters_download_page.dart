@@ -29,11 +29,13 @@ class ChapterDownloadPage extends StatelessWidget {
             size: 30,
             onTap: () {},
           ),
-          CoffeeIconButton(
-            onTap: () {},
-            icon: Icons.list,
-            size: 30,
-          ),
+          PopupMenuButton(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                child: CoffeeText(text: 'Limpar todos os downloads'),
+              )
+            ],
+          )
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

@@ -59,11 +59,14 @@ class _DownloadPageState extends State<DownloadPage> {
                     });
                   },
                 ),
-          CoffeeIconButton(
-            icon: Icons.list,
-            size: 30,
-            onTap: () {},
-          ),
+          PopupMenuButton(
+            icon: const Icon(Icons.list),
+            itemBuilder: (context) => [
+              const PopupMenuItem(
+                child: CoffeeText(text: 'Limpar todos os downloads'),
+              )
+            ],
+          )
         ],
       ),
       floatingActionButton: FloatingActionButton(
