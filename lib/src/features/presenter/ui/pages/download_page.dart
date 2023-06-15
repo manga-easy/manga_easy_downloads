@@ -1,5 +1,6 @@
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
+import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_manga_download.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/organisms/list_manga_download.dart';
 import 'package:manga_easy_themes/manga_easy_themes.dart';
@@ -25,49 +26,11 @@ class _DownloadPageState extends State<DownloadPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: ThemeService.of.backgroundColor,
-        elevation: 0,
-        leading: CoffeeIconButton(
-          icon: Icons.arrow_back_ios_new_outlined,
-          onTap: () => Navigator.pop(context),
+      appBar: const PreferredSize(
+        preferredSize: Size(double.infinity, 50),
+        child: CustomAppBar(
+          title: 'Downloads',
         ),
-        title: isSearch
-            ? CoffeeSearchField(
-                suffixIcon: CoffeeIconButton(
-                  icon: Icons.close,
-                  onTap: () {
-                    setState(() {
-                      isSearch = !isSearch;
-                    });
-                  },
-                ),
-              )
-            : const CoffeeText(
-                text: 'Downloads',
-                typography: CoffeeTypography.title,
-              ),
-        actions: [
-          isSearch
-              ? const SizedBox.shrink()
-              : CoffeeIconButton(
-                  icon: Icons.search,
-                  size: 30,
-                  onTap: () {
-                    setState(() {
-                      isSearch = !isSearch;
-                    });
-                  },
-                ),
-          PopupMenuButton(
-            icon: const Icon(Icons.list),
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                child: CoffeeText(text: 'Limpar todos os downloads'),
-              )
-            ],
-          )
-        ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: ThemeService.of.backgroundIcon,
@@ -83,7 +46,7 @@ class _DownloadPageState extends State<DownloadPage> {
               ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: CustomScrollView(
           slivers: [
             const SliverToBoxAdapter(

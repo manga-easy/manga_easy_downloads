@@ -1,5 +1,6 @@
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
+import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_chapter_download.dart';
 import 'package:manga_easy_themes/manga_easy_themes.dart';
 
@@ -10,33 +11,11 @@ class ChapterDownloadPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      appBar: AppBar(
-        backgroundColor: ThemeService.of.backgroundColor,
-        elevation: 0,
-        leading: CoffeeIconButton(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          icon: Icons.arrow_back_ios_new_outlined,
+      appBar: const PreferredSize(
+        preferredSize: Size(double.infinity, 50),
+        child: CustomAppBar(
+          title: 'One piece',
         ),
-        title: const CoffeeText(
-          text: 'One piece',
-          typography: CoffeeTypography.title,
-        ),
-        actions: [
-          CoffeeIconButton(
-            icon: Icons.search,
-            size: 30,
-            onTap: () {},
-          ),
-          PopupMenuButton(
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                child: CoffeeText(text: 'Limpar todos os downloads'),
-              )
-            ],
-          )
-        ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Material(
