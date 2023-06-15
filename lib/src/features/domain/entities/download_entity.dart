@@ -2,24 +2,31 @@ import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
 class DownloadEntity {
   String? id;
-  int idHost;
   String uniqueid;
   int idUser;
-  DetalhesManga detalhesManga;
-  List<Chapter> baixado;
-  List<Chapter> abaixar;
-  List<Chapter> erro;
-  DateTime dataCria;
+  String folder;
+  Manga manga;
+  Status status;
+  List<ChapterStatus> chapters;
+  DateTime createAt;
 
   DownloadEntity({
     this.id,
-    required this.idHost,
     required this.uniqueid,
     required this.idUser,
-    required this.dataCria,
-    required this.abaixar,
-    required this.baixado,
-    required this.detalhesManga,
-    required this.erro,
+    required this.createAt,
+    required this.manga,
+    required this.folder,
+    required this.chapters,
+    required this.status,
   });
+}
+
+enum Status { todo, doing, done, error }
+
+class ChapterStatus {
+  final Chapter chapter;
+  final Status status;
+
+  ChapterStatus(this.chapter, this.status);
 }
