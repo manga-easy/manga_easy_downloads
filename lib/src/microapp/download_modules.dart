@@ -1,44 +1,63 @@
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:manga_easy/main.dart';
-import 'package:manga_easy/modules/downloads/domain/repositories/download_repository_inter.dart';
-import 'package:manga_easy/modules/downloads/infra/api_download.dart';
-import 'package:manga_easy/modules/downloads/infra/download_repository.dart';
-import 'package:manga_easy/modules/downloads/presenter/controllers/all_downloads_controller.dart';
-import 'package:manga_easy/modules/downloads/presenter/controllers/downloads_controller.dart';
-import 'package:manga_easy/modules/downloads/presenter/ui/pages/all_downloads_page.dart';
-import 'package:manga_easy/modules/downloads/presenter/ui/pages/downloads_page.dart';
-import 'package:manga_easy_routes/manga_easy_routes.dart';
+// import 'package:flutter/material.dart';
+// import 'package:get_it/get_it.dart';
+// import 'package:manga_easy_downloads/src/features/data/mappers/download_mapper.dart';
+// import 'package:manga_easy_downloads/src/features/data/repositories/download_repository_imp.dart';
+// import 'package:manga_easy_downloads/src/features/domain/repositories/download_repository.dart';
+// import 'package:manga_easy_downloads/src/features/domain/usecases/create_usecase.dart';
+// import 'package:manga_easy_downloads/src/features/domain/usecases/delete_all_usecase.dart';
+// import 'package:manga_easy_downloads/src/features/domain/usecases/delete_usecase.dart';
+// import 'package:manga_easy_downloads/src/features/domain/usecases/get_usecase.dart';
+// import 'package:manga_easy_downloads/src/features/domain/usecases/implements/create_usecase_imp.dart';
+// import 'package:manga_easy_downloads/src/features/domain/usecases/implements/delete_all_usecase_imp.dart';
+// import 'package:manga_easy_downloads/src/features/domain/usecases/implements/delete_usecase_imp.dart';
+// import 'package:manga_easy_downloads/src/features/domain/usecases/implements/get_usecase_imp.dart';
+// import 'package:manga_easy_downloads/src/features/domain/usecases/implements/list_usecase_imp.dart';
+// import 'package:manga_easy_downloads/src/features/domain/usecases/implements/update_usecase_imp.dart';
+// import 'package:manga_easy_downloads/src/features/domain/usecases/list_usecase.dart';
+// import 'package:manga_easy_downloads/src/features/domain/usecases/update_usecase.dart';
+// import 'package:manga_easy_downloads/src/features/presenter/ui/pages/all_downloads_page.dart';
+// import 'package:manga_easy_downloads/src/features/presenter/ui/pages/downloads_page.dart';
+// import 'package:manga_easy_routes/manga_easy_routes.dart';
 
-class DownloadModule extends MicroApp {
-  @override
-  Map<String, Widget> routers = {
-    DonwloadsPage.router: const DonwloadsPage(),
-    AllDownloadsPage.router: const AllDownloadsPage()
-  };
+// class DownloadModule extends MicroApp {
+//   GetIt getIt = GetIt.instance;
+//   @override
+//   Map<String, Widget> routers = {
+//     DonwloadsPage.router: const DonwloadsPage(),
+//     AllDownloadsPage.router: const AllDownloadsPage()
+//   };
 
-  @override
-  void registerDependencies() {
-    //register cases
-    di.registerFactory(() => ApiDownload());
-    //register repositories
-    di.registerFactory<IDownloadRepositor>(() => DownloadRepository(di()));
-    //register controllers
-    di.registerFactory(
-      () => DonwloadsController(
-        di(),
-        di(),
-        di(),
-      ),
-    );
-    di.registerFactory(
-      () => AllDownloadsController(
-        download: di(),
-        detalhesMangaRepo: di(),
-        historicoRepo: di(),
-        mangaRepo: di(),
-        downloadRepositor: di(),
-        mangaMapper: di(),
-      ),
-    );
-  }
-}
+//   @override
+//   void registerDependencies() {
+//     //mapper
+//     getIt.registerFactory(() => DownloadMapper());
+//     //repositories
+//     getIt.registerFactory<DownloadRepository>(
+//         () => DownloadRepositoryImp(getIt()));
+//     //usecases
+//     getIt.registerFactory<CreateUsecase>(() => CreateUsecaseImp(getIt()));
+//     getIt.registerFactory<UpdateUsecase>(() => UpdateUsecaseImp(getIt()));
+//     getIt.registerFactory<DeleteUsecase>(() => DeleteUsecaseImp(getIt()));
+//     getIt.registerFactory<DeleteAllUsecase>(() => DeleteAllUsecaseImp(getIt()));
+//     getIt.registerFactory<GetUsecase>(() => GetUsecaseImp(getIt()));
+//     getIt.registerFactory<ListUsecase>(() => ListUsecaseImp(getIt()));
+//     //register controllers
+//     // getIt.registerFactory(
+//     //   () => DonwloadsController(
+//     //     getIt(),
+//     //     getIt(),
+//     //     getIt(),
+//     //   ),
+//     // );
+//     // getIt.registerFactory(
+//     //   () => AllDownloadsController(
+//     //     download: getIt(),
+//     //     detalhesMangaRepo: getIt(),
+//     //     historicoRepo: getIt(),
+//     //     mangaRepo: getIt(),
+//     //     downloadRepositor: getIt(),
+//     //     mangaMapper: getIt(),
+//     //   ),
+//    // );
+//   }
+// }
