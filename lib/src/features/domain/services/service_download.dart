@@ -1,280 +1,78 @@
-import 'dart:async';
 import 'dart:io';
-import 'package:client_driver/client_driver.dart';
-import 'package:flutter/foundation.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
-import 'package:manga_easy_downloads/src/features/domain/repositories/download_repository.dart';
-import 'package:manga_easy_hosts/manga_easy_hosts.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:manga_easy_sdk/manga_easy_sdk.dart';
+import 'package:manga_easy_downloads/src/features/domain/usecases/create_usecase.dart';
+import 'package:manga_easy_downloads/src/features/domain/usecases/delete_all_usecase.dart';
+import 'package:manga_easy_downloads/src/features/domain/usecases/delete_usecase.dart';
+import 'package:manga_easy_downloads/src/features/domain/usecases/get_usecase.dart';
+import 'package:manga_easy_downloads/src/features/domain/usecases/list_usecase.dart';
+import 'package:manga_easy_downloads/src/features/domain/usecases/update_usecase.dart';
 
-class ServiceDownloads extends ValueNotifier {
-  final DownloadRepository downloadRepositor;
-  final ClientRequest _clientRequest;
+class ServiceDownload {
+  final CreateUsecase createCase;
+  final UpdateUsecase updateCase;
+  final DeleteUsecase deleteCase;
+  final DeleteAllUsecase deleteAllCase;
+  final GetUsecase getCase;
+  final ListUsecase listCase;
+  //final ClientDio client;
 
-  ServiceDownloads(
-    this._clientRequest,
-    this.downloadRepositor,
-  ) : super(null);
+  ServiceDownload(this.createCase, this.updateCase, this.deleteCase,
+      this.deleteAllCase, this.getCase, this.listCase);
 
-  var pause = ValueNotifier(false);
-  var andamento = ValueNotifier(false);
+  final dio = Dio();
 
-  void starting() {
-    iniciaDowload();
-    return;
-  }
-
-  Future iniciaDowload() async {
-    var downloads = await downloadRepositor.list();
-    if (andamento.value) {
-      return null;
-    }
-    try {
-      if (kDebugMode) {
-        print('Serviço em andamento');
-      }
-      for (var i = 0; i < downloads.length; i++) {
-        andamento.value = true;
-        var download = downloads[i];
-        var auxi = download;
-        if (pause.value) {
-          andamento.value = false;
-          return null;
-        }
-        var idNoti = DateTime.now().second;
-        var totalAbaixar = download.abaixar.length;
-        var totalBaixado = 0;
-        if (download.abaixar.isNotEmpty) {
-          if (kDebugMode) {
-            print(
-                'Download em andamento: Baixando $totalBaixado de $totalAbaixar');
-          }
-          // await noti.showprogressNotification(
-          //   id: idNoti,
-          //   title: "Download em andamento",
-          //   progress: returnPorcent(totalBaixado, totalAbaixar),
-          //   body: 'Baixando $totalBaixado de $totalAbaixar',
-          // );
-          for (var capitulo in download.abaixar) {
-            var cap = auxi.baixado
-                .indexWhere((element) => capitulo.title == element.title);
-            if (cap < 0) {
-              try {
-                if (pause.value) {
-                  andamento.value = false;
-                  notifyListeners();
-                  return null;
+  Future<void> downloadFile(DownloadEntity downloadEntity) async {
+    var chapters = downloadEntity.chapters.map((e) => e).toList();
+    var images =
+        chapters.expand((e) => e.chapter.imagens.map((e) => e.src)).toList();
+    for (var chapter in chapters) {
+      for (var image in images) {
+        if (chapter.status == Status.todo) {
+          try {
+            chapter.status = Status.doing;
+            final response = await dio.get(
+              image,
+              options: Options(
+                headers: {
+                  'Authorization':
+                      'Bearer eyJhbGciOiJIUzUxMiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY1MTUxMDgwNCwiaWF0IjoxNjUxNTEwODA0fQ.q2iOBcQjNvQJXtw32zsYP6m0NLV2Pboxto92xa5t-R__HWzn2m8wc5f9uAfZof76xAaY6eZYuuGtU_lIjxusvQ',
+                },
+                responseType: ResponseType.bytes,
+              ),
+              onReceiveProgress: (receivedBytes, totalBytes) {
+                if (totalBytes != -1) {
+                  final progress =
+                      (receivedBytes / totalBytes * 100).toStringAsFixed(0);
+                  print('Progresso do download: $progress%');
                 }
-                if (!await Helps.verificarConexao()) {
-                  if (kDebugMode) {
-                    print('Download Pausado: Sem conexão');
-                  }
-                  // await noti.showDefaltNotication(
-                  //   id: idNoti,
-                  //   title: "Download Pausado",
-                  //   body: 'Sem conexão',
-                  // );
-                  andamento.value = false;
-                  return null;
-                }
-                var host = IHostManga.getHost(
-                  host: HostModel.empty(),
-                  headers: Global.header,
-                );
-                var retorno =
-                    await host.getConteudoChapter(manga: capitulo.href);
-                var listImages = retorno.toList();
-                var idImage = 0;
+              },
+            );
 
-                for (var image in listImages) {
-                  if (pause.value) {
-                    andamento.value = false;
-                    return null;
-                  }
-                  if (image.tipo == TypeFonte.image) {
-                    // await noti.showprogressNotification(
-                    //   id: idNoti,
-                    //   title: "Baixando Capítulo ${subStringCapName(capitulo)}",
-                    //   progress: returnPorcent(idImage, listImages.length),
-                    //   body: 'Baixando imagens $idImage de ${listImages.length}',
-                    // );
-                    var path = await downloadFile(
-                      imageUrl: image.src,
-                      pasta: "/${download.uniqueid}cap-${capitulo.title}image",
-                      cap: idImage.toString(),
-                    );
-                    if (path != null) {
-                      image.path = path;
-                    } else {
-                      return null;
-                    }
-
-                    idImage++;
-                  }
-                }
-                capitulo.imagens = listImages;
-                if (listImages.isEmpty) {
-                  throw Exception('Imagens vazias');
-                }
-                var cap = auxi.baixado
-                    .indexWhere((element) => capitulo.title == element.title);
-                if (cap < 0 && listImages.isNotEmpty) {
-                  auxi.abaixar.removeWhere(
-                      (element) => capitulo.title == element.title);
-                  auxi.baixado.add(capitulo);
-                }
-                totalBaixado++;
-                // await noti.showprogressNotification(
-                //   id: idNoti,
-                //   title: "Download em andamento",
-                //   progress: ((totalBaixado / totalAbaixar) * 100).toInt(),
-                //   body: 'Baixando $totalBaixado de $totalAbaixar',
-                // );
-              } catch (e) {
-                var cap = auxi.erro
-                    .indexWhere((element) => capitulo.title == element.title);
-                if (cap < 0) {
-                  auxi.abaixar.removeWhere(
-                      (element) => capitulo.title == element.title);
-                  auxi.erro.add(capitulo);
-                }
-                // await noti.showprogressNotification(
-                //   id: idNoti,
-                //   title: "Download com erro",
-                //   progress: returnPorcent(totalBaixado, totalAbaixar),
-                //   body: 'Erro no capítulo ${capitulo.title}',
-                // );
-                Helps.log(e);
-              }
-
-              await downloadRepositor.update(
-                data: download,
-                id: download.uniqueid,
-              );
+            final fileBytes = response.data;
+            var compressImage = await FlutterImageCompress.compressWithList(
+              fileBytes,
+              quality: 70,
+            );
+            var directory = Directory(
+                '${downloadEntity.folder}/${downloadEntity.uniqueid}/${chapter.chapter.title}');
+            if (!await directory.exists()) {
+              directory.create(recursive: true);
             }
+            var compressFile = File('${directory.path}/${image.split('/').last}');
+            await compressFile.writeAsBytes(compressImage);
 
-            notifyListeners();
+            //${downloadEntity.uniqueid}/${chapter.chapter.number}/
+
+            chapter.status = Status.done;
+            print('Download complete!');
+          } catch (e) {
+            print('Error during file download: $e');
           }
-          if (kDebugMode) {
-            print(
-                'Download finalizado: $totalBaixado capitulos de ${download.detalhesManga.title}');
-          }
-          // await noti.showDefaltNotication(
-          //   id: idNoti,
-          //   title: "Download finalizado",
-          //   body: '$totalBaixado capitulos de ${download.detalhesManga.title}',
-          // );
-          notifyListeners();
-        }
-      }
-      andamento.value = false;
-    } catch (e) {
-      Helps.log(e);
-      // await noti.showDefaltNotication(
-      //   id: DateTime.now().second,
-      //   title: "Erro nos downloads",
-      //   body: e.toString(),
-      // );
-      andamento.value = false;
-      return null;
-    }
-  }
-
-  Future<void> deletarDownload(Chapter cap, DownloadEntity down) async {
-    try {
-      for (var item in cap.imagens) {
-        if (item.path != null) {
-          var file = File(item.path!);
-          await file.delete();
-        }
-      }
-      down.baixado.removeWhere((element) => element.title == cap.title);
-      down.abaixar.removeWhere((element) => element.title == cap.title);
-      await downloadRepositor.update(data: down, id: down.uniqueid);
-      // await noti.showDefaltNotication(
-      //   id: DateTime.now().second,
-      //   title: "Deletado com sucesso",
-      //   body: 'Capitulo ${cap.title}',
-      // );
-      notifyListeners();
-    } catch (e) {
-      Helps.log(e);
-    }
-  }
-
-  Future deletaAllDownload(DownloadEntity download) async {
-    var captitulos = download.baixado.toList();
-    for (var item in captitulos) {
-      await deletarDownload(item, download);
-    }
-    await downloadRepositor.delete(id: download.uniqueid);
-    notifyListeners();
-  }
-
-  Future<String?> downloadFile(
-      {required String imageUrl,
-      required String pasta,
-      required String cap}) async {
-    try {
-      //comment out the next two lines to prevent the device from getting
-      // the image from the web in order to prove that the picture is
-      // coming from the device instead of the web
-      var type = imageUrl.substring(imageUrl.lastIndexOf('.'), imageUrl.length);
-      var patth = await getApplicationDocumentsDirectory();
-      var filename = '${patth.path}$pasta$cap$type';
-      if (kDebugMode) {
-        print(filename);
-      }
-      var response = await _clientRequest.get(path: imageUrl);
-      File file = File(filename);
-      if (!await file.exists()) {
-        // response.data is List<int> type
-        await file.writeAsBytes(response.data['data']);
-        if (response.statusCode == 200) {
-          return filename;
-        } else {
-          return null;
-        }
-      } else {
-        return filename;
-      }
-    } catch (e) {
-      // await noti.showDefaltNotication(
-      //   id: DateTime.now().second,
-      //   title: "Erro nos downloadFile",
-      //   body: e.toString(),
-      // );
-      Helps.log(e);
-      return null;
-    }
-  }
-
-  returnPorcent(int totalBaixado, int totalAbaixar) {
-    try {
-      return ((totalBaixado / totalAbaixar) * 100).toInt();
-    } catch (e) {
-      return 0;
-    }
-  }
-
-  subStringCapName(Chapter cap) {
-    return cap.title
-        .substring(0, cap.title.length > 15 ? 15 : cap.title.length);
-  }
-
-  Future<int> calculateFolderSize(String folderPath) async {
-    final folder = Directory(folderPath);
-    int totalSize = 0;
-
-    if (await folder.exists()) {
-      await for (var entity in folder.list(recursive: true)) {
-        if (entity is File) {
-          totalSize += await entity.length();
         }
       }
     }
-
-    return totalSize;
+    downloadEntity.status = Status.done;
   }
 }

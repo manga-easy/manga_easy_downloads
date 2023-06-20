@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:manga_easy_downloads/src/features/data/mappers/download_mapper.dart';
 import 'package:manga_easy_downloads/src/features/data/repositories/download_repository_imp.dart';
 import 'package:manga_easy_downloads/src/features/domain/repositories/download_repository.dart';
+import 'package:manga_easy_downloads/src/features/domain/services/service_download.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/create_usecase.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/delete_all_usecase.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/delete_usecase.dart';
@@ -41,9 +42,20 @@ class DownloadMicroApp extends MicroApp {
     getIt.registerFactory<GetUsecase>(() => GetUsecaseImp(getIt()));
     getIt.registerFactory<ListUsecase>(() => ListUsecaseImp(getIt()));
 
+//Service
+    getIt.registerFactory(() => ServiceDownload(
+          getIt(),
+          getIt(),
+          getIt(),
+          getIt(),
+          getIt(),
+          getIt(),
+        ));
+
 //Controller
     getIt.registerFactory(
       () => DownloadController(
+        getIt(),
         getIt(),
         getIt(),
         getIt(),
