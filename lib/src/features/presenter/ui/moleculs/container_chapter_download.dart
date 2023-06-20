@@ -2,20 +2,20 @@ import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
 
 class ContainerChapterDownload extends StatelessWidget {
-  final int chapter;
-  final int page;
+  final String chapters;
+  final String pages;
   final List<Widget> icons;
   const ContainerChapterDownload(
       {super.key,
       required this.icons,
-      required this.chapter,
-      required this.page});
+      required this.chapters,
+      required this.pages});
 
-  String convertPage(int page) {
+  String convertPage(String page) {
     if (page.toString() == '1') {
-      return '${page.toString().padLeft(2, '0')} página';
+      return '${page.padLeft(2, '0')} página';
     }
-    return '${page.toString().padLeft(2, '0')} páginas';
+    return '${page.padLeft(2, '0')} páginas';
   }
 
   @override
@@ -29,10 +29,10 @@ class ContainerChapterDownload extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CoffeeText(
-                    text: 'Capítulo ${chapter.toString().padLeft(2, '0')}',
+                    text: 'Capítulo ${chapters.toString().padLeft(2, '0')}',
                     typography: CoffeeTypography.button),
                 CoffeeText(
-                  text: convertPage(3),
+                  text: convertPage(pages),
                 ),
               ],
             ),

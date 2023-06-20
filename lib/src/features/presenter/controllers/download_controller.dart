@@ -62,6 +62,7 @@ class DownloadController extends ChangeNotifier {
   }
 
   var listTodo = [];
+  var listDone = [];
 
   void downloadFile() async {
     try {
@@ -70,6 +71,11 @@ class DownloadController extends ChangeNotifier {
       for (var todo in listTodo) {
         await service.downloadFile(todo);
       }
+      listTodo =
+          listMangaDownload.where((e) => e.status == Status.todo).toList();
+      listDone =
+          listMangaDownload.where((e) => e.status == Status.done).toList();
+      notifyListeners();
     } catch (e) {
       print(e);
     }
@@ -90,7 +96,7 @@ class DownloadController extends ChangeNotifier {
       notifyListeners();
       return '$totalSize';
     } catch (e) {
-     return 'N/A';
+      return 'N/A';
     }
   }
 }

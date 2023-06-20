@@ -1,5 +1,7 @@
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_manga_download.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/organisms/list_manga_download.dart';
@@ -14,27 +16,32 @@ class DownloadPage extends StatefulWidget {
   State<DownloadPage> createState() => _DownloadPageState();
 }
 
-List<Widget> _items = [
-  const ContainerMangaDownload(),
-  const ContainerMangaDownload(),
-  const ContainerMangaDownload(),
-];
-
 class _DownloadPageState extends State<DownloadPage> {
+  DownloadController ct = GetIt.I();
+  @override
+  void initState() {
+    ct.init();
+    ct.addListener(() {
+      setState(() {});
+    });
+    super.initState();
+  }
+
   bool isSearch = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const PreferredSize(
-        preferredSize: Size(double.infinity, 50),
+      appBar: PreferredSize(
+        preferredSize: const Size(double.infinity, 50),
         child: CustomAppBar(
           title: 'Downloads',
+          ct: ct,
         ),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: ThemeService.of.backgroundIcon,
-        onPressed: () {},
+        onPressed: () => ct.downloadFile(),
         child: false
             ? const Icon(
                 Icons.pause,
@@ -49,21 +56,34 @@ class _DownloadPageState extends State<DownloadPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: CustomScrollView(
           slivers: [
-            const SliverToBoxAdapter(
+            SliverToBoxAdapter(
               child: Row(
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CoffeeText(text: '8 capítulos baixados no total'),
-                      CoffeeText(text: '1 capítulo em transferência'),
+                      ct.listDone.length > 1
+                          ? CoffeeText(
+                              text:
+                                  '${ct.listDone.length} capítulos baixados no total')
+                          : CoffeeText(
+                              text:
+                                  '${ct.listDone.length} capítulo baixado no total'),
+                      ct.listTodo.length > 1
+                          ? CoffeeText(
+                              text:
+                                  '${ct.listDone.length} capítulos em transferência')
+                          : CoffeeText(
+                              text:
+                                  '${ct.listTodo.length} capítulo em transferência'),
                     ],
                   ),
                 ],
               ),
             ),
-            const SliverVisibility(
-              sliver: SliverPadding(
+            SliverVisibility(
+              visible: ct.listTodo.isNotEmpty,
+              sliver: const SliverPadding(
                 padding: EdgeInsets.symmetric(vertical: 10),
                 sliver: SliverToBoxAdapter(
                   child: CoffeeText(
@@ -74,21 +94,38 @@ class _DownloadPageState extends State<DownloadPage> {
               ),
             ),
             SliverVisibility(
-              visible: true,
+              visible: ct.listTodo.isNotEmpty,
               sliver: ReorderableSliverList(
-                delegate: ReorderableSliverChildListDelegate(_items),
+                delegate: ReorderableSliverChildBuilderDelegate(
+                  childCount: ct.listTodo.length,
+                  (context, idx) {
+                    var mangaDownload = ct.listTodo[idx];
+                    return ContainerMangaDownload(
+                      ct: ct,
+                      name: mangaDownload.manga.title,
+                      host: 'Manga easy Originals',
+                      chaptersDownload: '${mangaDownload.chapters.length}',
+                      imageManga: mangaDownload.manga.capa,
+                      megaByte:
+                          '${ct.calculateFolderSize(mangaDownload.folder)}',
+                      chapters: mangaDownload.chapters[idx].chapter.title,
+                      pages:
+                          '${mangaDownload.chapters[idx].chapter.imagens.length}',
+                    );
+                  },
+                ),
                 onReorder: (oldIndex, newIndex) {
                   setState(() {
                     if (newIndex > oldIndex) {
                       newIndex -= 1;
                     }
-                    final item = _items.removeAt(oldIndex);
-                    _items.insert(newIndex, item);
+                    final item = ct.listDone.removeAt(oldIndex);
+                    ct.listDone.insert(newIndex, item);
                   });
                 },
               ),
             ),
-            const ListMangaDownload(title: 'Baixados'),
+            ListMangaDownload(title: 'Baixados', ct: ct),
           ],
         ),
       ),

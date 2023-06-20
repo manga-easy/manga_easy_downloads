@@ -1,10 +1,12 @@
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
+import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_manga_download.dart';
 
 class ListMangaDownload extends StatelessWidget {
   final String title;
-  const ListMangaDownload({super.key, required this.title});
+  final DownloadController ct;
+  const ListMangaDownload({super.key, required this.title, required this.ct});
 
   @override
   Widget build(BuildContext context) {
@@ -18,11 +20,21 @@ class ListMangaDownload extends StatelessWidget {
             typography: CoffeeTypography.title,
           ),
           ListView.builder(
-            itemCount: 2,
+            itemCount: ct.listDone.length,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            itemBuilder: (context, index) {
-              return const ContainerMangaDownload();
+            itemBuilder: (context, idx) {
+              var mangaDownload = ct.listDone[idx];
+              return ContainerMangaDownload(
+                ct: ct,
+                name: mangaDownload.manga.title,
+                host: 'Manga easy Originals',
+                chaptersDownload: '${mangaDownload.chapters.length}',
+                imageManga: mangaDownload.manga.capa,
+                megaByte: '${ct.calculateFolderSize(mangaDownload.folder)}',
+                chapters: mangaDownload.chapters[idx].chapter.title,
+                pages: '${mangaDownload.chapters[idx].chapter.imagens.length}',
+              );
             },
           )
         ],
