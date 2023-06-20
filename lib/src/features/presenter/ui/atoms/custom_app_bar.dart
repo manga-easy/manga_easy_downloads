@@ -1,10 +1,12 @@
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
+import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_themes/manga_easy_themes.dart';
 
 class CustomAppBar extends StatefulWidget {
   final String title;
-  const CustomAppBar({super.key, required this.title});
+  final DownloadController ct;
+  const CustomAppBar({super.key, required this.title, required this.ct});
 
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
@@ -55,6 +57,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
           itemBuilder: (context) => [
             const PopupMenuItem(
               child: CoffeeText(text: 'Limpar todos os downloads'),
+            ),
+            PopupMenuItem(
+              onTap: () => widget.ct.pickDirectory(),
+              child: CoffeeText(text: 'Escolher pasta para download'),
             )
           ],
         )
