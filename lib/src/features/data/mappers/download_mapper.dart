@@ -1,5 +1,4 @@
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
-import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
 class DownloadMapper {
   DownloadEntity fromJson(Map<String, dynamic> json) {
