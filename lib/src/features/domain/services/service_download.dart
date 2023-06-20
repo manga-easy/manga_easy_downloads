@@ -29,7 +29,8 @@ class ServiceDownload {
         chapters.expand((e) => e.chapter.imagens.map((e) => e.src)).toList();
     for (var chapter in chapters) {
       for (var image in images) {
-        if (chapter.status == Status.todo) {
+        print(image);
+        if (chapter.status == Status.todo || chapter.status == Status.doing) {
           try {
             chapter.status = Status.doing;
             final response = await dio.get(
@@ -53,25 +54,26 @@ class ServiceDownload {
             final fileBytes = response.data;
             var compressImage = await FlutterImageCompress.compressWithList(
               fileBytes,
-              quality: 70,
+              quality: 20,
             );
             var directory = Directory(
                 '${downloadEntity.folder}/${downloadEntity.uniqueid}/${chapter.chapter.title}');
             if (!await directory.exists()) {
-              directory.create(recursive: true);
+              await directory.create(recursive: true);
             }
-            var compressFile = File('${directory.path}/${image.split('/').last}');
+            var compressFile =
+                File('${directory.path}/${image.split('/').last}');
             await compressFile.writeAsBytes(compressImage);
 
             //${downloadEntity.uniqueid}/${chapter.chapter.number}/
 
-            chapter.status = Status.done;
             print('Download complete!');
           } catch (e) {
             print('Error during file download: $e');
           }
         }
       }
+      chapter.status = Status.done;
     }
     downloadEntity.status = Status.done;
   }
