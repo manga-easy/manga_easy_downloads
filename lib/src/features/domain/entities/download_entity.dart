@@ -6,7 +6,7 @@ class DownloadEntity {
   int idUser;
   String folder;
   Manga manga;
-  Status status;
+  
   List<ChapterStatus> chapters;
   DateTime createAt;
 
@@ -18,7 +18,6 @@ class DownloadEntity {
     required this.manga,
     required this.folder,
     required this.chapters,
-    required this.status,
   });
 }
 
@@ -26,7 +25,7 @@ enum Status { todo, doing, done, error }
 
 class ChapterStatus {
   final Chapter chapter;
-  final Status status;
+   Status status;
 
   ChapterStatus(this.chapter, this.status);
 }

@@ -1,4 +1,5 @@
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
+import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
 class DownloadMapper {
   DownloadEntity fromJson(Map<String, dynamic> json) {
@@ -6,11 +7,15 @@ class DownloadMapper {
       id: json['id'] ?? '',
       uniqueid: json['uniqueid'],
       idUser: json['idUser'],
-      createAt: json['createAt'],
+      createAt: DateTime.tryParse(json['createAt']) ?? DateTime.now(),
       folder: json['folder'],
-      manga: json['manga'],
-      status: json['status'],
-      chapters: json['chapters'],
+      manga: Manga.fromJson(json['manga']),
+      chapters: json['chapters'].map(
+        (e) => ChapterStatus(
+          Chapter.fromJson(e['chapters']),
+          Status.values.firstWhere((e) => e.name == json['chapters']),
+        ),
+      ),
     );
   }
 
@@ -19,11 +24,12 @@ class DownloadMapper {
       'id': data.id,
       'uniqueid': data.uniqueid,
       'idUser': data.idUser,
-      'createAt': data.createAt,
+      'createAt': data.createAt.toString(),
       'folder': data.folder,
-      'manga': data.manga,
-      'status': data.status,
-      'chapters': data.chapters,
+      'manga': data.manga.toJson(),
+      'chapters': data.chapters
+          .map((e) => {'chapter': e.chapter.toJson(), 'status': e.status.name})
+          .toList(),
     };
   }
 }
