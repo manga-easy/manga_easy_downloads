@@ -32,8 +32,10 @@ class DownloadMicroApp extends MicroApp {
     //mapper
     getIt.registerFactory(() => DownloadMapper());
     //repositories
-    getIt.registerFactory<DownloadRepository>(
-        () => DownloadRepositoryImp(getIt()));
+    getIt.registerFactory<DownloadRepository>(() => DownloadRepositoryImp(
+          getIt(),
+          getIt(),
+        ));
     //usecases
     getIt.registerFactory<CreateUsecase>(() => CreateUsecaseImp(getIt()));
     getIt.registerFactory<UpdateUsecase>(() => UpdateUsecaseImp(getIt()));
