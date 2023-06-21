@@ -1,20 +1,37 @@
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
+import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
+import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
-import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_chapter_download.dart';
-import 'package:manga_easy_themes/manga_easy_themes.dart';
+import 'package:manga_easy_downloads/src/features/presenter/ui/organisms/list_chapter_download.dart';
 
 class ChapterDownloadPage extends StatelessWidget {
-  const ChapterDownloadPage({super.key});
+  final DownloadController ct;
+  final String name;
+  final String pages;
+  final String chapters;
+  final List<ChapterStatus> listChapterTodo;
+  final List<ChapterStatus> listChapterDone;
+
+  const ChapterDownloadPage({
+    super.key,
+    required this.ct,
+    required this.name,
+    required this.pages,
+    required this.chapters,
+    required this.listChapterTodo,
+    required this.listChapterDone,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBody: true,
-      appBar: const PreferredSize(
-        preferredSize: Size(double.infinity, 50),
+      appBar: PreferredSize(
+        preferredSize: const Size(double.infinity, 50),
         child: CustomAppBar(
-          title: 'One piece',
+          title: name,
+          ct: ct,
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -47,7 +64,7 @@ class ChapterDownloadPage extends StatelessWidget {
         child: CustomScrollView(
           slivers: [
             SliverVisibility(
-              visible: true,
+              visible: listChapterTodo.isNotEmpty,
               sliver: SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,27 +73,21 @@ class ChapterDownloadPage extends StatelessWidget {
                       text: 'Em transferência',
                       typography: CoffeeTypography.title,
                     ),
-                    ListView.builder(
-                      itemCount: 5,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return ContainerChapterDownload(
-                          chapter: 5,
-                          page: 100,
-                          icons: [
-                            CoffeeIconButton(
-                              onTap: () {},
-                              icon: Icons.download,
-                            ),
-                            CoffeeIconButton(
-                              onTap: () {},
-                              icon: Icons.cancel_outlined,
-                            ),
-                          ],
-                        );
-                      },
-                    )
+                    ListChapterDownload(
+                      chapters: chapters,
+                      pages: pages,
+                      listChapter: listChapterTodo,
+                      icons: [
+                        CoffeeIconButton(
+                          onTap: () {},
+                          icon: Icons.download,
+                        ),
+                        CoffeeIconButton(
+                          onTap: () {},
+                          icon: Icons.cancel_outlined,
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -90,22 +101,16 @@ class ChapterDownloadPage extends StatelessWidget {
                     text: 'Baixados',
                     typography: CoffeeTypography.title,
                   ),
-                  ListView.builder(
-                    itemCount: 5,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      return ContainerChapterDownload(
-                        chapter: 5,
-                        page: 2,
-                        icons: [
-                          CoffeeIconButton(
-                            onTap: () {},
-                            icon: Icons.delete_outline_sharp,
-                          ),
-                        ],
-                      );
-                    },
+                  ListChapterDownload(
+                    listChapter: listChapterDone,
+                    chapters: chapters,
+                    pages: pages,
+                    icons: [
+                      CoffeeIconButton(
+                        onTap: () {},
+                        icon: Icons.delete_outline_sharp,
+                      ),
+                    ],
                   ),
                 ],
               ),

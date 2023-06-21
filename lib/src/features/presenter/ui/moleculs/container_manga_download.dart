@@ -1,5 +1,6 @@
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
+import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/pages/chapters_download_page.dart';
 import 'package:manga_easy_themes/manga_easy_themes.dart';
@@ -14,6 +15,8 @@ class ContainerMangaDownload extends StatelessWidget {
   final String pages;
   final DownloadController ct;
   final bool isDownload;
+  final List<ChapterStatus> listChapterTodo;
+  final List<ChapterStatus> listChapterDone;
   const ContainerMangaDownload(
       {super.key,
       required this.ct,
@@ -24,7 +27,9 @@ class ContainerMangaDownload extends StatelessWidget {
       required this.megaByte,
       required this.chapters,
       required this.pages,
-      this.isDownload = false});
+      this.isDownload = false,
+      required this.listChapterTodo,
+      required this.listChapterDone});
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +44,8 @@ class ContainerMangaDownload extends StatelessWidget {
               name: name,
               chapters: chapters,
               pages: pages,
+              listChapterDone: listChapterDone,
+              listChapterTodo: listChapterTodo,
             ),
           ),
         ),

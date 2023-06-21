@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/create_usecase.dart';
@@ -9,7 +10,7 @@ import 'package:manga_easy_downloads/src/features/domain/usecases/get_usecase.da
 import 'package:manga_easy_downloads/src/features/domain/usecases/list_usecase.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/update_usecase.dart';
 
-class ServiceDownload {
+class ServiceDownload extends ChangeNotifier {
   final CreateUsecase createCase;
   final UpdateUsecase updateCase;
   final DeleteUsecase deleteCase;
@@ -29,7 +30,7 @@ class ServiceDownload {
         chapters.expand((e) => e.chapter.imagens.map((e) => e.src)).toList();
     for (var chapter in chapters) {
       for (var image in images) {
-        print(image);
+       
         if (chapter.status == Status.todo || chapter.status == Status.doing) {
           try {
             chapter.status = Status.doing;
@@ -46,7 +47,7 @@ class ServiceDownload {
                 if (totalBytes != -1) {
                   final progress =
                       (receivedBytes / totalBytes * 100).toStringAsFixed(0);
-                  print('Progresso do download: $progress%');
+                 // print('Progresso do download: $progress%');
                 }
               },
             );
@@ -57,7 +58,7 @@ class ServiceDownload {
               quality: 20,
             );
             var directory = Directory(
-                '${downloadEntity.folder}/${downloadEntity.uniqueid}/${chapter.chapter.title}');
+                '${downloadEntity.folder}/Manga Easy/${downloadEntity.uniqueid}/${chapter.chapter.title}');
             if (!await directory.exists()) {
               await directory.create(recursive: true);
             }
@@ -68,6 +69,7 @@ class ServiceDownload {
             //${downloadEntity.uniqueid}/${chapter.chapter.number}/
 
             print('Download complete!');
+            notifyListeners();
           } catch (e) {
             print('Error during file download: $e');
           }
@@ -75,6 +77,8 @@ class ServiceDownload {
       }
       chapter.status = Status.done;
     }
-    downloadEntity.status = Status.done;
+
+    updateCase.update(data: downloadEntity, id: downloadEntity.uniqueid);
+    notifyListeners();
   }
 }
