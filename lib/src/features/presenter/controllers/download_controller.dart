@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
@@ -32,6 +31,9 @@ class DownloadController extends ChangeNotifier {
 
   void init() {
     listDownload();
+    service.addListener(
+      () => listDownload(),
+    );
     notifyListeners();
   }
 
@@ -61,42 +63,56 @@ class DownloadController extends ChangeNotifier {
     return '/storage/emulated/0/Downloads';
   }
 
-  var listTodo = [];
-  var listDone = [];
+  List<DownloadEntity> listTodo = [];
+  List<DownloadEntity> listDone = [];
 
   void downloadFile() async {
     try {
-      listTodo =
-          listMangaDownload.where((e) => e.status == Status.todo).toList();
+      listTodo = listMangaDownload
+          .where(
+              (element) => element.chapters.any((e) => e.status == Status.todo))
+          .toList();
+
       for (var todo in listTodo) {
         await service.downloadFile(todo);
       }
-      listTodo =
-          listMangaDownload.where((e) => e.status == Status.todo).toList();
-      listDone =
-          listMangaDownload.where((e) => e.status == Status.done).toList();
+      listDownload();
+      listTodo = listMangaDownload
+          .where(
+              (element) => element.chapters.any((e) => e.status == Status.todo))
+          .toList();
+
+      print(listTodo);
+      listDone = listMangaDownload
+          .where(
+              (element) => element.chapters.any((e) => e.status == Status.done))
+          .toList();
+      print(listDone);
       notifyListeners();
     } catch (e) {
       print(e);
     }
   }
 
-  Future<String> calculateFolderSize(String folderPath) async {
+  String calculateFolderSize(String dirPath) {
+    int fileNum = 0;
+    int totalSize = 0;
+    var dir = Directory(dirPath);
     try {
-      final folder = Directory(folderPath);
-      int totalSize = 0;
-
-      if (await folder.exists()) {
-        await for (var entity in folder.list(recursive: true)) {
+      if (dir.existsSync()) {
+        dir
+            .listSync(recursive: true, followLinks: false)
+            .forEach((FileSystemEntity entity) {
           if (entity is File) {
-            totalSize += await entity.length();
+            fileNum++;
+            totalSize += entity.lengthSync();
           }
-        }
+        });
       }
-      notifyListeners();
-      return '$totalSize';
     } catch (e) {
-      return 'N/A';
+      print(e.toString());
     }
+    var totalMegaByte = (totalSize / (1024 * 1024)).floor();
+    return '$totalMegaByte';
   }
 }

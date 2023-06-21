@@ -1,5 +1,6 @@
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
+import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_manga_download.dart';
 
@@ -25,13 +26,22 @@ class ListMangaDownload extends StatelessWidget {
             physics: const NeverScrollableScrollPhysics(),
             itemBuilder: (context, idx) {
               var mangaDownload = ct.listDone[idx];
+              var chapterStatusDone = mangaDownload.chapters
+                  .where((element) => element.status == Status.done)
+                  .toList();
+              var chapterStatusTodo = mangaDownload.chapters
+                  .where((element) => element.status == Status.todo)
+                  .toList();
               return ContainerMangaDownload(
+                listChapterDone: chapterStatusDone,
+                listChapterTodo: chapterStatusTodo,
                 ct: ct,
                 name: mangaDownload.manga.title,
                 host: 'Manga easy Originals',
                 chaptersDownload: '${mangaDownload.chapters.length}',
                 imageManga: mangaDownload.manga.capa,
-                megaByte: '${ct.calculateFolderSize(mangaDownload.folder)}',
+                megaByte:
+                    '${ct.calculateFolderSize('${mangaDownload.folder}/Manga Easy/${mangaDownload.uniqueid}')} MB',
                 chapters: mangaDownload.chapters[idx].chapter.title,
                 pages: '${mangaDownload.chapters[idx].chapter.imagens.length}',
               );
