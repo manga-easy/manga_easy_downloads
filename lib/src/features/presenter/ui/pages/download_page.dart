@@ -43,14 +43,19 @@ class _DownloadPageState extends State<DownloadPage> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: ThemeService.of.backgroundIcon,
-        onPressed: () => ct.downloadFile(),
-        child: false
+        onPressed: () {
+          setState(() {
+            ct.savePausePref();
+          });
+          ct.downloadFile();
+        },
+        child: ct.isPause
             ? const Icon(
-                Icons.pause,
+                Icons.play_arrow,
                 size: 30,
               )
             : const Icon(
-                Icons.play_arrow,
+                Icons.pause,
                 size: 30,
               ),
       ),
@@ -111,13 +116,14 @@ class _DownloadPageState extends State<DownloadPage> {
                     return ContainerMangaDownload(
                       listChapterDone: chapterStatusDone,
                       listChapterTodo: chapterStatusTodo,
+                      isDownload: true,
                       ct: ct,
                       name: mangaDownload.manga.title,
                       host: 'Manga easy Originals',
                       chaptersDownload: '${mangaDownload.chapters.length}',
                       imageManga: mangaDownload.manga.capa,
                       megaByte:
-                        '${ct.calculateFolderSize('${mangaDownload.folder}/Manga Easy')} MB',
+                          '${ct.calculateFolderSize('${mangaDownload.folder}/Manga Easy')} MB',
                       chapters: mangaDownload.chapters[idx].chapter.title,
                       pages:
                           '${mangaDownload.chapters[idx].chapter.imagens.length}',
@@ -129,8 +135,8 @@ class _DownloadPageState extends State<DownloadPage> {
                     if (newIndex > oldIndex) {
                       newIndex -= 1;
                     }
-                    final item = ct.listDone.removeAt(oldIndex);
-                    ct.listDone.insert(newIndex, item);
+                    final item = ct.listTodo.removeAt(oldIndex);
+                    ct.listTodo.insert(newIndex, item);
                   });
                 },
               ),

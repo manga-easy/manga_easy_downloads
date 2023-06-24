@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:get_it/get_it.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_downloads/src/features/domain/services/service_download.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/create_usecase.dart';
@@ -9,6 +10,7 @@ import 'package:manga_easy_downloads/src/features/domain/usecases/delete_usecase
 import 'package:manga_easy_downloads/src/features/domain/usecases/get_usecase.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/list_usecase.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/update_usecase.dart';
+import 'package:persistent_database/persistent_database.dart';
 
 class DownloadController extends ChangeNotifier {
   final CreateUsecase createCase;
@@ -17,7 +19,8 @@ class DownloadController extends ChangeNotifier {
   final DeleteAllUsecase deleteAllCase;
   final GetUsecase getCase;
   final ListUsecase listCase;
-  final ServiceDownload service;
+  final ServiceDownload _service;
+  final Preference _servicePrefs;
 
   DownloadController(
     this.createCase,
@@ -26,15 +29,32 @@ class DownloadController extends ChangeNotifier {
     this.deleteAllCase,
     this.getCase,
     this.listCase,
-    this.service,
+    this._service,
+    this._servicePrefs,
   );
 
-  void init() {
+  bool isPause = false;
+
+  void init() async {
     listDownload();
-    service.addListener(
+    isPause = await readPausePref();
+    _service.addListener(
       () => listDownload(),
     );
     notifyListeners();
+  }
+
+  void savePausePref() async {
+    isPause = !isPause;
+    await _servicePrefs.put(
+      keyPreferences: KeyPreferences.downloadPauseAll,
+      value: isPause,
+    );
+  }
+
+  Future<bool> readPausePref() async {
+    return await _servicePrefs.get<bool>(
+        keyPreferences: KeyPreferences.downloadPauseAll);
   }
 
   List<DownloadEntity> listMangaDownload = [];
@@ -43,24 +63,17 @@ class DownloadController extends ChangeNotifier {
     notifyListeners();
   }
 
-  var folder = '/storage/emulated/0/Downloads';
-
-  Future<String> pickDirectory() async {
+  Future<void> pickDirectory() async {
     final directoryPath = await FilePicker.platform.getDirectoryPath();
-
     if (directoryPath != null) {
       // O usuário selecionou uma pasta
       print('Pasta selecionada: $directoryPath');
-      return folder = directoryPath;
-      // ou fazer outras operações.
+      Preference(GetIt.instance()).put(
+        keyPreferences: KeyPreferences.downloadFolder,
+        value: directoryPath,
+      );
     }
-    if (directoryPath == null) {
-      // O usuário cancelou a seleção da pasta.
-      print('Seleção de pasta cancelada.');
-      return '';
-    }
-
-    return '/storage/emulated/0/Downloads';
+    return;
   }
 
   List<DownloadEntity> listTodo = [];
@@ -74,13 +87,16 @@ class DownloadController extends ChangeNotifier {
           .toList();
 
       for (var todo in listTodo) {
-        await service.downloadFile(todo);
+        await _service.downloadFile(todo);
       }
       listDownload();
       listTodo = listMangaDownload
           .where(
               (element) => element.chapters.any((e) => e.status == Status.todo))
           .toList();
+      print(listMangaDownload
+          .map((e) => e.chapters)
+          .map((e) => e.map((e) => e.status)));
 
       print(listTodo);
       listDone = listMangaDownload
@@ -96,6 +112,7 @@ class DownloadController extends ChangeNotifier {
 
   String calculateFolderSize(String dirPath) {
     int fileNum = 0;
+
     int totalSize = 0;
     var dir = Directory(dirPath);
     try {
