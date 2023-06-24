@@ -19,6 +19,7 @@ import 'package:manga_easy_downloads/src/features/domain/usecases/update_usecase
 import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/pages/download_page.dart';
 import 'package:manga_easy_routes/manga_easy_routes.dart';
+import 'package:persistent_database/persistent_database.dart';
 
 class DownloadMicroApp extends MicroApp {
   GetIt getIt = GetIt.instance;
@@ -57,6 +58,7 @@ class DownloadMicroApp extends MicroApp {
 //Controller
     getIt.registerFactory(
       () => DownloadController(
+        getIt(),
         getIt(),
         getIt(),
         getIt(),
