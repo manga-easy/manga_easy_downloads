@@ -1,17 +1,16 @@
-import 'package:manga_easy_persistent_database_service/manga_easy_persistent_database_service.dart';
 import 'package:manga_easy_downloads/src/features/data/mappers/download_mapper.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_downloads/src/features/domain/repositories/download_repository.dart';
+import 'package:persistent_database/persistent_database.dart';
 
 class DownloadRepositoryImp implements DownloadRepository {
   final DownloadMapper mapper;
-  final PersistentDatabaseSembastService db;
-
+  final PersistentDatabaseSembast db;
   DownloadRepositoryImp(
     this.mapper,
     this.db,
   );
-  final store = StoreSembast.toggle;
+  final store = StoreSembast.download;
 
   @override
   Future<String> create({required DownloadEntity data}) async {
