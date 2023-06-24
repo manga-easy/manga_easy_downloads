@@ -30,10 +30,8 @@ dependencies:
     git:
       url: https://github.com/manga-easy/manga_easy_routes.git
       ref: v1.0.2
-  manga_easy_persistent_database_service:
-    git: 
-      url: https://github.com/manga-easy/manga_easy_persistent_database_service.git
-      ref: v1.0.0
+  persistent_database:
+    path: ../lib_persistent_database
   # manga_easy_hosts:
   #   git:
   #     url: https://github.com/manga-easy/manga_easy_hosts.git

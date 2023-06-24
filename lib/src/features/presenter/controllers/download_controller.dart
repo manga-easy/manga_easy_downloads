@@ -111,25 +111,31 @@ class DownloadController extends ChangeNotifier {
   }
 
   String calculateFolderSize(String dirPath) {
-    int fileNum = 0;
-
-    int totalSize = 0;
     var dir = Directory(dirPath);
+    int totalSize = 0;
     try {
       if (dir.existsSync()) {
         dir
             .listSync(recursive: true, followLinks: false)
             .forEach((FileSystemEntity entity) {
           if (entity is File) {
-            fileNum++;
             totalSize += entity.lengthSync();
           }
         });
       }
     } catch (e) {
-      print(e.toString());
+      return 'N/A';
     }
+    var totalKbytes = (totalSize / 1024).floor();
     var totalMegaByte = (totalSize / (1024 * 1024)).floor();
-    return '$totalMegaByte';
+
+    return totalKbytes > 1000 ? '$totalMegaByte MB' : '$totalKbytes kB';
+  }
+
+  void progress(receivedBytes, totalBytes) {
+    if (totalBytes != -1) {
+      final progress = (receivedBytes / totalBytes * 100).toStringAsFixed(0);
+      // print('Progresso do download: $progress%');
+    }
   }
 }

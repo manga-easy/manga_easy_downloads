@@ -123,7 +123,7 @@ class _DownloadPageState extends State<DownloadPage> {
                       chaptersDownload: '${mangaDownload.chapters.length}',
                       imageManga: mangaDownload.manga.capa,
                       megaByte:
-                          '${ct.calculateFolderSize('${mangaDownload.folder}/Manga Easy')} MB',
+                          ct.calculateFolderSize('${mangaDownload.folder}/${mangaDownload.uniqueid}'),
                       chapters: mangaDownload.chapters[idx].chapter.title,
                       pages:
                           '${mangaDownload.chapters[idx].chapter.imagens.length}',

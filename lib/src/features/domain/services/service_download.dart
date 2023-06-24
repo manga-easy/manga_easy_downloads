@@ -30,7 +30,6 @@ class ServiceDownload extends ChangeNotifier {
         chapters.expand((e) => e.chapter.imagens.map((e) => e.src)).toList();
     for (var chapter in chapters) {
       for (var image in images) {
-       
         if (chapter.status == Status.todo || chapter.status == Status.doing) {
           try {
             chapter.status = Status.doing;
@@ -47,7 +46,7 @@ class ServiceDownload extends ChangeNotifier {
                 if (totalBytes != -1) {
                   final progress =
                       (receivedBytes / totalBytes * 100).toStringAsFixed(0);
-                 // print('Progresso do download: $progress%');
+                  print('Progresso do download: $progress%');
                 }
               },
             );
@@ -55,18 +54,17 @@ class ServiceDownload extends ChangeNotifier {
             final fileBytes = response.data;
             var compressImage = await FlutterImageCompress.compressWithList(
               fileBytes,
-              quality: 20,
+              quality: 100,
             );
             var directory = Directory(
-                '${downloadEntity.folder}/Manga Easy/${downloadEntity.uniqueid}/${chapter.chapter.title}');
-            if (!await directory.exists()) {
+                '${downloadEntity.folder}/${downloadEntity.uniqueid}/${chapter.chapter.number}');
+            if (!directory.existsSync()) {
               await directory.create(recursive: true);
             }
             var compressFile =
                 File('${directory.path}/${image.split('/').last}');
-            await compressFile.writeAsBytes(compressImage);
-
-            //${downloadEntity.uniqueid}/${chapter.chapter.number}/
+            await compressFile.writeAsBytes(compressImage,
+                mode: FileMode.write);
 
             print('Download complete!');
             notifyListeners();
@@ -79,6 +77,9 @@ class ServiceDownload extends ChangeNotifier {
     }
 
     updateCase.update(data: downloadEntity, id: downloadEntity.uniqueid);
+    print(downloadEntity.chapters.map(
+      (e) => e.status,
+    ));
     notifyListeners();
   }
 }
