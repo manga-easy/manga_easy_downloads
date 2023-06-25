@@ -33,26 +33,47 @@ class DownloadController extends ChangeNotifier {
     this._servicePrefs,
   );
 
-  bool isPause = false;
+  bool isPausedAll = false;
+  bool isPaused = false;
 
   void init() async {
     listDownload();
-    isPause = await readPausePref();
+    isPausedAll = await readPauseAllPref();
     _service.addListener(
       () => listDownload(),
     );
     notifyListeners();
   }
 
-  void savePausePref() async {
-    isPause = !isPause;
+  void pauseDownload() async {
+    isPaused = true;
+    await _servicePrefs.put(
+      keyPreferences: KeyPreferences.downloadPause,
+      value: isPaused,
+    );
+    // TODO: implement pause
+    notifyListeners();
+  }
+
+  void resumeDownload() async {
+    isPaused = false;
+    await _servicePrefs.put(
+      keyPreferences: KeyPreferences.downloadPause,
+      value: isPaused,
+    );
+    // TODO: implement resume
+    notifyListeners();
+  }
+
+  void savePauseAllPref() async {
+    isPausedAll = !isPausedAll;
     await _servicePrefs.put(
       keyPreferences: KeyPreferences.downloadPauseAll,
-      value: isPause,
+      value: isPausedAll,
     );
   }
 
-  Future<bool> readPausePref() async {
+  Future<bool> readPauseAllPref() async {
     return await _servicePrefs.get<bool>(
         keyPreferences: KeyPreferences.downloadPauseAll);
   }
@@ -90,18 +111,19 @@ class DownloadController extends ChangeNotifier {
         await _service.downloadFile(todo);
       }
       listDownload();
-      listTodo = listMangaDownload
-          .where(
-              (element) => element.chapters.any((e) => e.status == Status.todo))
-          .toList();
-      print(listMangaDownload
-          .map((e) => e.chapters)
-          .map((e) => e.map((e) => e.status)));
+      // listTodo = listMangaDownload
+      //     .where(
+      //         (element) => element.chapters.any((e) => e.status == Status.todo))
+      //     .toList();
+      // print(listMangaDownload
+      //     .map((e) => e.chapters)
+      //     .map((e) => e.map((e) => e.status)));
 
-      print(listTodo);
+      print(listTodo.map((e) => e.chapters).map((e) => e.map((e) => e.status)));
+      listTodo = [];
       listDone = listMangaDownload
-          .where(
-              (element) => element.chapters.any((e) => e.status == Status.done))
+          .where((element) =>
+              element.chapters.any((element) => element.status == Status.todo))
           .toList();
       print(listDone);
       notifyListeners();

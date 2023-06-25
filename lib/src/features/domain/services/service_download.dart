@@ -26,13 +26,18 @@ class ServiceDownload extends ChangeNotifier {
 
   Future<void> downloadFile(DownloadEntity downloadEntity) async {
     var chapters = downloadEntity.chapters.map((e) => e).toList();
+    print('Total de capítulos: ${chapters.length}');
     var images =
         chapters.expand((e) => e.chapter.imagens.map((e) => e.src)).toList();
+    print('Total de imagens: ${images.length}');
     for (var chapter in chapters) {
       for (var image in images) {
         if (chapter.status == Status.todo || chapter.status == Status.doing) {
           try {
             chapter.status = Status.doing;
+            updateCase.update(
+                data: downloadEntity, id: downloadEntity.uniqueid);
+
             final response = await dio.get(
               image,
               options: Options(
@@ -46,7 +51,7 @@ class ServiceDownload extends ChangeNotifier {
                 if (totalBytes != -1) {
                   final progress =
                       (receivedBytes / totalBytes * 100).toStringAsFixed(0);
-                  print('Progresso do download: $progress%');
+                  // print('Progresso do download: $progress%');
                 }
               },
             );
@@ -74,6 +79,7 @@ class ServiceDownload extends ChangeNotifier {
         }
       }
       chapter.status = Status.done;
+      updateCase.update(data: downloadEntity, id: downloadEntity.uniqueid);
     }
 
     updateCase.update(data: downloadEntity, id: downloadEntity.uniqueid);

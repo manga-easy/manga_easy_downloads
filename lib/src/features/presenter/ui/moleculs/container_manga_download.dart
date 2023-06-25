@@ -28,10 +28,10 @@ class ContainerMangaDownload extends StatelessWidget {
     required this.megaByte,
     required this.chapters,
     required this.pages,
-    this.isDownload = false,
-    this.isPaused = false,
+    required this.isPaused,
     required this.listChapterTodo,
     required this.listChapterDone,
+    this.isDownload = false,
   });
 
   @override
@@ -70,7 +70,7 @@ class ContainerMangaDownload extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CoffeeText(
-                          text: '$name teste texto longo quebra linha',
+                          text: name,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           typography: CoffeeTypography.title,
@@ -124,7 +124,8 @@ class ContainerMangaDownload extends StatelessWidget {
                                     Icons.pause_circle_filled,
                                     size: 30,
                                   ),
-                                  onPressed: () {},
+                                  visualDensity: VisualDensity.compact,
+                                  onPressed: () => ct.resumeDownload(),
                                 )
                               : IconButton(
                                   icon: const Icon(
@@ -132,7 +133,7 @@ class ContainerMangaDownload extends StatelessWidget {
                                     size: 30,
                                   ),
                                   visualDensity: VisualDensity.compact,
-                                  onPressed: () {},
+                                  onPressed: () => ct.pauseDownload(),
                                 ),
                         ],
                       ),

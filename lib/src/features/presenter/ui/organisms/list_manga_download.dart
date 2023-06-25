@@ -36,6 +36,7 @@ class ListMangaDownload extends StatelessWidget {
                 listChapterDone: chapterStatusDone,
                 listChapterTodo: chapterStatusTodo,
                 ct: ct,
+                isPaused: ct.isPaused,
                 name: mangaDownload.manga.title,
                 host: 'Manga easy Originals',
                 chaptersDownload: '${mangaDownload.chapters.length}',
