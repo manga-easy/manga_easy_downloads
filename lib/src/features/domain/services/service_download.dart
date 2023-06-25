@@ -10,7 +10,7 @@ import 'package:manga_easy_downloads/src/features/domain/usecases/get_usecase.da
 import 'package:manga_easy_downloads/src/features/domain/usecases/list_usecase.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/update_usecase.dart';
 
-class ServiceDownload extends ChangeNotifier {
+class ServiceDownload {
   final CreateUsecase createCase;
   final UpdateUsecase updateCase;
   final DeleteUsecase deleteCase;
@@ -18,28 +18,34 @@ class ServiceDownload extends ChangeNotifier {
   final GetUsecase getCase;
   final ListUsecase listCase;
   //final ClientDio client;
+  final dio = Dio();
+  ValueNotifier<double> downloadProgress = ValueNotifier<double>(0.0);
 
   ServiceDownload(this.createCase, this.updateCase, this.deleteCase,
       this.deleteAllCase, this.getCase, this.listCase);
 
-  final dio = Dio();
+  double getDownloadProgress(int totalImages, int completedImages) {
+    return totalImages > 0 ? completedImages / totalImages : 0.0;
+  }
 
   Future<void> downloadFile(DownloadEntity downloadEntity) async {
-    var chapters = downloadEntity.chapters.map((e) => e).toList();
-    print('Total de capítulos: ${chapters.length}');
+    var chapters = downloadEntity.chapters;
     var images =
-        chapters.expand((e) => e.chapter.imagens.map((e) => e.src)).toList();
+        chapters.expand((e) => e.chapter.imagens.map((e) => e)).toList();
+    int completedChapters = 0;
+    print('Total de capítulos: ${chapters.length}');
     print('Total de imagens: ${images.length}');
     for (var chapter in chapters) {
       for (var image in images) {
         if (chapter.status == Status.todo || chapter.status == Status.doing) {
           try {
             chapter.status = Status.doing;
-            updateCase.update(
+            await updateCase.update(
                 data: downloadEntity, id: downloadEntity.uniqueid);
 
+            print('Downloading image: ${image.src}');
             final response = await dio.get(
-              image,
+              image.src,
               options: Options(
                 headers: {
                   'Authorization':
@@ -47,13 +53,6 @@ class ServiceDownload extends ChangeNotifier {
                 },
                 responseType: ResponseType.bytes,
               ),
-              onReceiveProgress: (receivedBytes, totalBytes) {
-                if (totalBytes != -1) {
-                  final progress =
-                      (receivedBytes / totalBytes * 100).toStringAsFixed(0);
-                  // print('Progresso do download: $progress%');
-                }
-              },
             );
 
             final fileBytes = response.data;
@@ -67,25 +66,27 @@ class ServiceDownload extends ChangeNotifier {
               await directory.create(recursive: true);
             }
             var compressFile =
-                File('${directory.path}/${image.split('/').last}');
+                File('${directory.path}/${image.src.split('/').last}');
             await compressFile.writeAsBytes(compressImage,
                 mode: FileMode.write);
 
+            completedChapters++;
+            downloadProgress.value =
+                getDownloadProgress(images.length, completedChapters);
             print('Download complete!');
-            notifyListeners();
           } catch (e) {
             print('Error during file download: $e');
           }
         }
       }
       chapter.status = Status.done;
-      updateCase.update(data: downloadEntity, id: downloadEntity.uniqueid);
+      await updateCase.update(
+          data: downloadEntity, id: downloadEntity.uniqueid);
+      print('Chapter ${chapter.chapter.number} marked as done.');
     }
 
-    updateCase.update(data: downloadEntity, id: downloadEntity.uniqueid);
-    print(downloadEntity.chapters.map(
-      (e) => e.status,
-    ));
-    notifyListeners();
+    await updateCase.update(data: downloadEntity, id: downloadEntity.uniqueid);
+    print('Download entity updated.');
+    print(downloadEntity.chapters.map((e) => e.status));
   }
 }

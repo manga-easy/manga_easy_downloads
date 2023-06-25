@@ -117,6 +117,7 @@ class _DownloadPageState extends State<DownloadPage> {
                       listChapterDone: chapterStatusDone,
                       listChapterTodo: chapterStatusTodo,
                       isDownload: true,
+                      downloadProgress: ct.downloadProgress,
                       ct: ct,
                       name: mangaDownload.manga.title,
                       host: 'Manga easy Originals',

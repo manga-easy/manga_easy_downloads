@@ -13,6 +13,7 @@ class ContainerMangaDownload extends StatelessWidget {
   final String megaByte;
   final String chapters;
   final String pages;
+  final double downloadProgress;
   final DownloadController ct;
   final bool isDownload;
   final bool isPaused;
@@ -32,6 +33,7 @@ class ContainerMangaDownload extends StatelessWidget {
     required this.listChapterTodo,
     required this.listChapterDone,
     this.isDownload = false,
+    this.downloadProgress = 0.0,
   });
 
   @override
@@ -112,7 +114,7 @@ class ContainerMangaDownload extends StatelessWidget {
                                     backgroundColor:
                                         ThemeService.of.selectColor,
                                     minHeight: 6,
-                                    value: 0.5,
+                                    value: downloadProgress,
                                   ),
                                 ),
                               ],

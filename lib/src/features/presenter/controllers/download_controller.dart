@@ -39,8 +39,13 @@ class DownloadController extends ChangeNotifier {
   void init() async {
     listDownload();
     isPausedAll = await readPauseAllPref();
-    _service.addListener(
-      () => listDownload(),
+    _service.downloadProgress.addListener(
+      () {
+        // listDownload();
+        downloadProgress = _service.downloadProgress.value;
+        print('Progress: $downloadProgress');
+        notifyListeners();
+      },
     );
     notifyListeners();
   }
@@ -79,7 +84,7 @@ class DownloadController extends ChangeNotifier {
 
   List<DownloadEntity> listTodo = [];
   List<DownloadEntity> listDone = [];
-
+  double downloadProgress = 0.0;
   void downloadFile() async {
     try {
       print(listTodo);
@@ -91,16 +96,20 @@ class DownloadController extends ChangeNotifier {
       if (listTodo.isNotEmpty) {
         for (var todo in listTodo) {
           await _service.downloadFile(todo);
+          // Atualiza listTodo após o download de cada elemento
+          listTodo = listMangaDownload
+              .where((element) =>
+                  element.chapters.any((e) => e.status == Status.todo))
+              .toList();
+          // Atualiza listDone após o download de cada elemento
+          listDone = listMangaDownload
+              .where((element) => element.chapters
+                  .any((element) => element.status == Status.done))
+              .toList();
+          notifyListeners();
         }
       }
       listDownload();
-      // listTodo = listMangaDownload
-      //     .where(
-      //         (element) => element.chapters.any((e) => e.status == Status.todo))
-      //     .toList();
-      // print(listMangaDownload
-      //     .map((e) => e.chapters)
-      //     .map((e) => e.map((e) => e.status)));
 
       print(listTodo.map((e) => e.chapters).map((e) => e.map((e) => e.status)));
       listDone = listMangaDownload
@@ -109,7 +118,8 @@ class DownloadController extends ChangeNotifier {
           .toList();
 
       print('listTodo $listTodo');
-      print('list done $listDone');
+      print('list done ${listDone.map((e) => e.manga.title).toList()}');
+
       notifyListeners();
     } catch (e) {
       print(e);
