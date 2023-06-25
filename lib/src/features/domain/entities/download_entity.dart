@@ -21,7 +21,7 @@ class DownloadEntity {
   });
 }
 
-enum Status { todo, doing, done, error }
+enum Status { todo, doing, paused, done, error }
 
 class ChapterStatus {
   final Chapter chapter;
