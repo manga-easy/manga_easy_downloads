@@ -45,25 +45,6 @@ class DownloadController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void pauseDownload() async {
-    isPaused = true;
-    await _servicePrefs.put(
-      keyPreferences: KeyPreferences.downloadPause,
-      value: isPaused,
-    );
-    // TODO: implement pause
-    notifyListeners();
-  }
-
-  void resumeDownload() async {
-    isPaused = false;
-    await _servicePrefs.put(
-      keyPreferences: KeyPreferences.downloadPause,
-      value: isPaused,
-    );
-    // TODO: implement resume
-    notifyListeners();
-  }
 
   void savePauseAllPref() async {
     isPausedAll = !isPausedAll;

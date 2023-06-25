@@ -125,7 +125,7 @@ class ContainerMangaDownload extends StatelessWidget {
                                     size: 30,
                                   ),
                                   visualDensity: VisualDensity.compact,
-                                  onPressed: () => ct.resumeDownload(),
+                                  onPressed: () {},
                                 )
                               : IconButton(
                                   icon: const Icon(
@@ -133,7 +133,7 @@ class ContainerMangaDownload extends StatelessWidget {
                                     size: 30,
                                   ),
                                   visualDensity: VisualDensity.compact,
-                                  onPressed: () => ct.pauseDownload(),
+                                  onPressed: () {},
                                 ),
                         ],
                       ),
