@@ -45,7 +45,6 @@ class DownloadController extends ChangeNotifier {
     notifyListeners();
   }
 
-
   void savePauseAllPref() async {
     isPausedAll = !isPausedAll;
     await _servicePrefs.put(
@@ -83,13 +82,16 @@ class DownloadController extends ChangeNotifier {
 
   void downloadFile() async {
     try {
+      print(listTodo);
       listTodo = listMangaDownload
           .where(
               (element) => element.chapters.any((e) => e.status == Status.todo))
           .toList();
-
-      for (var todo in listTodo) {
-        await _service.downloadFile(todo);
+      print(listTodo);
+      if (listTodo.isNotEmpty) {
+        for (var todo in listTodo) {
+          await _service.downloadFile(todo);
+        }
       }
       listDownload();
       // listTodo = listMangaDownload
@@ -101,12 +103,13 @@ class DownloadController extends ChangeNotifier {
       //     .map((e) => e.map((e) => e.status)));
 
       print(listTodo.map((e) => e.chapters).map((e) => e.map((e) => e.status)));
-      listTodo = [];
       listDone = listMangaDownload
           .where((element) =>
-              element.chapters.any((element) => element.status == Status.todo))
+              element.chapters.any((element) => element.status == Status.done))
           .toList();
-      print(listDone);
+
+      print('listTodo $listTodo');
+      print('list done $listDone');
       notifyListeners();
     } catch (e) {
       print(e);
