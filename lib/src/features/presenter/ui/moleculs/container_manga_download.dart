@@ -15,61 +15,62 @@ class ContainerMangaDownload extends StatelessWidget {
   final String pages;
   final DownloadController ct;
   final bool isDownload;
+  final bool isPaused;
   final List<ChapterStatus> listChapterTodo;
   final List<ChapterStatus> listChapterDone;
-  const ContainerMangaDownload(
-      {super.key,
-      required this.ct,
-      required this.imageManga,
-      required this.name,
-      required this.chaptersDownload,
-      required this.host,
-      required this.megaByte,
-      required this.chapters,
-      required this.pages,
-      this.isDownload = false,
-      required this.listChapterTodo,
-      required this.listChapterDone});
+  const ContainerMangaDownload({
+    super.key,
+    required this.ct,
+    required this.imageManga,
+    required this.name,
+    required this.chaptersDownload,
+    required this.host,
+    required this.megaByte,
+    required this.chapters,
+    required this.pages,
+    this.isDownload = false,
+    this.isPaused = false,
+    required this.listChapterTodo,
+    required this.listChapterDone,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 10),
-      child: GestureDetector(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChapterDownloadPage(
-              ct: ct,
-              name: name,
-              chapters: chapters,
-              pages: pages,
-              listChapterDone: listChapterDone,
-              listChapterTodo: listChapterTodo,
-            ),
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ChapterDownloadPage(
+            ct: ct,
+            name: name,
+            chapters: chapters,
+            pages: pages,
+            listChapterDone: listChapterDone,
+            listChapterTodo: listChapterTodo,
           ),
         ),
-        child: CoffeeContainer(
+      ),
+      child: CoffeeContainer(
+        child: SizedBox(
+          height: 200,
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CoffeeMangaCover(
                 cover: imageManga,
-                height: 200,
                 width: 125,
                 filtraImg: true,
               ),
               const SizedBox(width: 10),
-              Expanded(
+              Flexible(
                 child: Column(
-                  //mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CoffeeText(
-                          text: name,
+                          text: '$name teste texto longo quebra linha',
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           typography: CoffeeTypography.title,
@@ -94,17 +95,17 @@ class ContainerMangaDownload extends StatelessWidget {
                     Visibility(
                       visible: isDownload,
                       child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const CoffeeText(
-                                text: 'Em transferência',
-                              ),
-                              const SizedBox(height: 5),
-                              SizedBox(
-                                width: 150,
-                                child: ClipRRect(
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const CoffeeText(
+                                  text: 'Em transferência',
+                                ),
+                                const SizedBox(height: 5),
+                                ClipRRect(
                                   borderRadius: BorderRadius.circular(20),
                                   child: LinearProgressIndicator(
                                     color: ThemeService.of.primaryColor,
@@ -114,11 +115,10 @@ class ContainerMangaDownload extends StatelessWidget {
                                     value: 0.5,
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                          const SizedBox(width: 5),
-                          true
+                          isPaused
                               ? IconButton(
                                   icon: const Icon(
                                     Icons.pause_circle_filled,
@@ -131,6 +131,7 @@ class ContainerMangaDownload extends StatelessWidget {
                                     Icons.play_circle,
                                     size: 30,
                                   ),
+                                  visualDensity: VisualDensity.compact,
                                   onPressed: () {},
                                 ),
                         ],
