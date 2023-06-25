@@ -45,11 +45,11 @@ class _DownloadPageState extends State<DownloadPage> {
         backgroundColor: ThemeService.of.backgroundIcon,
         onPressed: () {
           setState(() {
-            ct.savePausePref();
+            ct.savePauseAllPref();
           });
           ct.downloadFile();
         },
-        child: ct.isPause
+        child: ct.isPausedAll
             ? const Icon(
                 Icons.play_arrow,
                 size: 30,
@@ -120,10 +120,11 @@ class _DownloadPageState extends State<DownloadPage> {
                       ct: ct,
                       name: mangaDownload.manga.title,
                       host: 'Manga easy Originals',
+                      isPaused: ct.isPaused,
                       chaptersDownload: '${mangaDownload.chapters.length}',
                       imageManga: mangaDownload.manga.capa,
-                      megaByte:
-                          ct.calculateFolderSize('${mangaDownload.folder}/${mangaDownload.uniqueid}'),
+                      megaByte: ct.calculateFolderSize(
+                          '${mangaDownload.folder}/${mangaDownload.uniqueid}'),
                       chapters: mangaDownload.chapters[idx].chapter.title,
                       pages:
                           '${mangaDownload.chapters[idx].chapter.imagens.length}',
