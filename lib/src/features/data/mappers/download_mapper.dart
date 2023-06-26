@@ -10,12 +10,14 @@ class DownloadMapper {
       createAt: DateTime.tryParse(json['createAt']) ?? DateTime.now(),
       folder: json['folder'],
       manga: Manga.fromJson(json['manga']),
-      chapters: json['chapters'].map(
-        (e) => ChapterStatus(
-          Chapter.fromJson(e['chapters']),
-          Status.values.firstWhere((e) => e.name == json['chapters']),
-        ),
-      ),
+      chapters: (json['chapters'] as List)
+          .map(
+            (e) => ChapterStatus(
+                Chapter.fromJson(e['chapter']),
+                Status.values.firstWhere(
+                    (s) => s.toString().split('.').last == e['status'])),
+          )
+          .toList(),
     );
   }
 
