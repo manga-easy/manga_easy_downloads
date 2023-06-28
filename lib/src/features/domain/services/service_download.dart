@@ -9,8 +9,9 @@ import 'package:manga_easy_downloads/src/features/domain/usecases/delete_usecase
 import 'package:manga_easy_downloads/src/features/domain/usecases/get_usecase.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/list_usecase.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/update_usecase.dart';
+import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
-class ServiceDownload {
+class ServiceDownload extends ChangeNotifier {
   final CreateUsecase createCase;
   final UpdateUsecase updateCase;
   final DeleteUsecase deleteCase;
@@ -19,74 +20,87 @@ class ServiceDownload {
   final ListUsecase listCase;
   //final ClientDio client;
   final dio = Dio();
-  ValueNotifier<double> downloadProgress = ValueNotifier<double>(0.0);
+  double downloadProgress = 0.0;
 
   ServiceDownload(this.createCase, this.updateCase, this.deleteCase,
       this.deleteAllCase, this.getCase, this.listCase);
+
+  CancelToken cancelToken = CancelToken();
 
   double getDownloadProgress(int totalImages, int completedImages) {
     return totalImages > 0 ? completedImages / totalImages : 0.0;
   }
 
-  Future<void> downloadFile(DownloadEntity downloadEntity) async {
-    var chapters = downloadEntity.chapters;
-    var images =
-        chapters.expand((e) => e.chapter.imagens.map((e) => e)).toList();
-    int completedChapters = 0;
-    print('Total de capítulos: ${chapters.length}');
-    print('Total de imagens: ${images.length}');
-    for (var chapter in chapters) {
-      for (var image in images) {
-        if (chapter.status == Status.todo || chapter.status == Status.doing) {
-          try {
-            chapter.status = Status.doing;
-            await updateCase.update(
-                data: downloadEntity, id: downloadEntity.uniqueid);
-
-            print('Downloading image: ${image.src}');
-            final response = await dio.get(
-              image.src,
-              options: Options(
-                headers: {
-                  'Authorization':
-                      'Bearer eyJhbGciOiJIUzUxMiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY1MTUxMDgwNCwiaWF0IjoxNjUxNTEwODA0fQ.q2iOBcQjNvQJXtw32zsYP6m0NLV2Pboxto92xa5t-R__HWzn2m8wc5f9uAfZof76xAaY6eZYuuGtU_lIjxusvQ',
-                },
-                responseType: ResponseType.bytes,
-              ),
-            );
-
-            final fileBytes = response.data;
-            var compressImage = await FlutterImageCompress.compressWithList(
-              fileBytes,
-              quality: 100,
-            );
-            var directory = Directory(
-                '${downloadEntity.folder}/${downloadEntity.uniqueid}/${chapter.chapter.number}');
-            if (!directory.existsSync()) {
-              await directory.create(recursive: true);
-            }
-            var compressFile =
-                File('${directory.path}/${image.src.split('/').last}');
-            await compressFile.writeAsBytes(compressImage,
-                mode: FileMode.write);
-
-            completedChapters++;
-            downloadProgress.value =
-                getDownloadProgress(images.length, completedChapters);
-            print('Download complete!');
-          } catch (e) {
-            print('Error during file download: $e');
-          }
-        }
-      }
-      chapter.status = Status.done;
-      await updateCase.update(
-          data: downloadEntity, id: downloadEntity.uniqueid);
-      print('Chapter ${chapter.chapter.number} marked as done.');
-    }
-
-    await updateCase.update(data: downloadEntity, id: downloadEntity.uniqueid);
-    print('Download entity updated.');
-    print(downloadEntity.chapters.map((e) => e.status));
+  void progress(int totalImages, int completedImages) {
+    downloadProgress = getDownloadProgress(totalImages, completedImages);
+    notifyListeners();
   }
+
+  Future<void> downloadFile(DownloadEntity downloadEntity) async {
+    // int completedChapters = 0;
+    //ler a lista de capitulos
+
+    for (var chapter in downloadEntity.chapters) {
+      var directory = Directory(
+          '${downloadEntity.folder}/${downloadEntity.uniqueid}/${chapter.chapter.number}');
+      if (!directory.existsSync()) {
+        await directory.create(recursive: true);
+      }
+      List<ImageChapter> imagensDownload = chapter.chapter.imagens;
+      if (chapter.status == Status.done) continue;
+      for (var image in imagensDownload) {
+        // if (File('${directory.path}/${image.src.split('/').last}')
+        //     .existsSync()) {
+        //   continue;
+        // }
+        try {
+          final response = await dio.get(
+            image.src,
+            options: Options(
+              headers: {
+                'Authorization':
+                    'Bearer eyJhbGciOiJIUzUxMiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY1MTUxMDgwNCwiaWF0IjoxNjUxNTEwODA0fQ.q2iOBcQjNvQJXtw32zsYP6m0NLV2Pboxto92xa5t-R__HWzn2m8wc5f9uAfZof76xAaY6eZYuuGtU_lIjxusvQ',
+              },
+              responseType: ResponseType.bytes,
+            ),
+            cancelToken: cancelToken,
+            onReceiveProgress: (received, total) {
+              int percentage = ((received / total) * 100).floor();
+              print('$percentage%');
+            },
+          );
+
+          final fileBytes = response.data;
+          var compressImage = await FlutterImageCompress.compressWithList(
+            fileBytes,
+            quality: 20,
+          );
+          var compressFile =
+              File('${directory.path}/${image.src.split('/').last}');
+          await compressFile.writeAsBytes(compressImage, mode: FileMode.write);
+
+          notifyListeners();
+        } catch (e) {
+          chapter.status = Status.error;
+          print('Deu erro no download: $e');
+        }
+
+        // completedChapters++;
+        // progress(chaptersDownload.length, completedChapters);
+        chapter.status = Status.done;
+        updateCase.update(data: downloadEntity, id: downloadEntity.uniqueid);
+      }
+    }
+  }
+
+  void pauseDownload() {
+    cancelToken.cancel();
+  }
+
+  // void resumeDownload(DownloadEntity downloadEntity) {
+  //   cancelToken = CancelToken();
+  //   downloadFile(downloadEntity);
+  // }
+  // Future<void> delete() {
+  // }
 }

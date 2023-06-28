@@ -113,22 +113,24 @@ class _DownloadPageState extends State<DownloadPage> {
                     var chapterStatusTodo = mangaDownload.chapters
                         .where((element) => element.status == Status.todo)
                         .toList();
-                    return ContainerMangaDownload(
-                      listChapterDone: chapterStatusDone,
-                      listChapterTodo: chapterStatusTodo,
-                      isDownload: true,
-                      downloadProgress: ct.downloadProgress,
-                      ct: ct,
-                      name: mangaDownload.manga.title,
-                      host: 'Manga easy Originals',
-                      isPaused: ct.isPaused,
-                      chaptersDownload: '${mangaDownload.chapters.length}',
-                      imageManga: mangaDownload.manga.capa,
-                      megaByte: ct.calculateFolderSize(
-                          '${mangaDownload.folder}/${mangaDownload.uniqueid}'),
-                      chapters: mangaDownload.chapters[idx].chapter.title,
-                      pages:
-                          '${mangaDownload.chapters[idx].chapter.imagens.length}',
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: ContainerMangaDownload(
+                        listChapterDone: chapterStatusDone,
+                        listChapterTodo: chapterStatusTodo,
+                        isDownload: true,
+                        downloadProgress: ct.downloadProgress,
+                        ct: ct,
+                        name: mangaDownload.manga.title,
+                        host: 'Manga easy Originals',
+                        isPaused: ct.isPaused,
+                        chaptersDownload: '${mangaDownload.chapters.length}',
+                        imageManga: mangaDownload.manga.capa,
+                        megaByte: ct.calculateFolderSize(
+                            '${mangaDownload.folder}/${mangaDownload.uniqueid}'),
+                        pages:
+                            '${mangaDownload.chapters[idx].chapter.imagens.length}',
+                      ),
                     );
                   },
                 ),

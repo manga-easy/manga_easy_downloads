@@ -4,12 +4,12 @@ import 'package:manga_easy_downloads/src/features/domain/entities/download_entit
 import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/organisms/list_chapter_download.dart';
+import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
 class ChapterDownloadPage extends StatelessWidget {
   final DownloadController ct;
   final String name;
   final String pages;
-  final String chapters;
   final List<ChapterStatus> listChapterTodo;
   final List<ChapterStatus> listChapterDone;
 
@@ -18,7 +18,6 @@ class ChapterDownloadPage extends StatelessWidget {
     required this.ct,
     required this.name,
     required this.pages,
-    required this.chapters,
     required this.listChapterTodo,
     required this.listChapterDone,
   });
@@ -74,7 +73,6 @@ class ChapterDownloadPage extends StatelessWidget {
                       typography: CoffeeTypography.title,
                     ),
                     ListChapterDownload(
-                      chapters: chapters,
                       pages: pages,
                       listChapter: listChapterTodo,
                       icons: [
@@ -103,7 +101,6 @@ class ChapterDownloadPage extends StatelessWidget {
                   ),
                   ListChapterDownload(
                     listChapter: listChapterDone,
-                    chapters: chapters,
                     pages: pages,
                     icons: [
                       CoffeeIconButton(

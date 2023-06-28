@@ -11,7 +11,7 @@ class ContainerMangaDownload extends StatelessWidget {
   final String chaptersDownload;
   final String host;
   final String megaByte;
-  final String chapters;
+
   final String pages;
   final double downloadProgress;
   final DownloadController ct;
@@ -27,7 +27,6 @@ class ContainerMangaDownload extends StatelessWidget {
     required this.chaptersDownload,
     required this.host,
     required this.megaByte,
-    required this.chapters,
     required this.pages,
     required this.isPaused,
     required this.listChapterTodo,
@@ -45,7 +44,6 @@ class ContainerMangaDownload extends StatelessWidget {
           builder: (context) => ChapterDownloadPage(
             ct: ct,
             name: name,
-            chapters: chapters,
             pages: pages,
             listChapterDone: listChapterDone,
             listChapterTodo: listChapterTodo,
