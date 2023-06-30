@@ -31,6 +31,7 @@ class ChapterDownloadPage extends StatelessWidget {
         child: CustomAppBar(
           title: name,
           ct: ct,
+          onClean: () {},
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

@@ -11,6 +11,7 @@ import 'package:manga_easy_downloads/src/features/domain/usecases/get_usecase.da
 import 'package:manga_easy_downloads/src/features/domain/usecases/list_usecase.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/update_usecase.dart';
 import 'package:manga_easy_sdk/manga_easy_sdk.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:persistent_database/persistent_database.dart';
 
 class DownloadController extends ChangeNotifier {
@@ -38,7 +39,6 @@ class DownloadController extends ChangeNotifier {
   bool isPaused = false;
 
   void init() async {
-    create();
     listDownload();
     isPausedAll = await readPauseAllPref();
     notifyListeners();
@@ -137,7 +137,50 @@ class DownloadController extends ChangeNotifier {
     }
   }
 
+  void deleteAllDownload() async {
+    for (var downloadTransfer in listTodo) {
+      final folder =
+          Directory('${downloadTransfer.folder}/${downloadTransfer.uniqueid}');
+
+      await deleteCase.delete(id: downloadTransfer.uniqueid);
+      if (await folder.exists()) {
+        folder.deleteSync(recursive: true);
+        listDownload();
+        notifyListeners();
+      } else {
+        print('A pasta não existe');
+      }
+    }
+
+    for (var download in listDone) {
+      final folder = Directory('${download.folder}/${download.uniqueid}');
+
+      await deleteCase.delete(id: download.uniqueid);
+      if (await folder.exists()) {
+        folder.deleteSync(recursive: true);
+        listDownload();
+        notifyListeners();
+
+        print('Pasta excluída com sucesso');
+      } else {
+        print('A pasta não existe');
+      }
+    }
+    print(listTodo.first.uniqueid);
+    listDownload();
+    notifyListeners();
+  }
+
   void create() async {
+    //   bool permissionStatus;
+    //   final deviceInfo = await DeviceInfoPlugin().androidInfo;
+
+    // if (deviceInfo.version.sdkInt > 32) {
+    //   permissionStatus = await Permission.photos.request().isGranted;
+    // } else {
+    //   permissionStatus = await Permission.storage.request().isGranted;
+    // }
+
     await createCase.create(
       data: DownloadEntity(
         uniqueid: "MentallyBroken",
@@ -403,5 +446,8 @@ class DownloadController extends ChangeNotifier {
         ],
       ),
     );
+    listDownload();
+
+    notifyListeners();
   }
 }

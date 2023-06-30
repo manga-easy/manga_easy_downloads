@@ -40,7 +40,8 @@ class ServiceDownload extends ChangeNotifier {
     // int completedChapters = 0;
     //ler a lista de capitulos
 
-    for (var chapter in downloadEntity.chapters) {
+    for (var i = 0; i < downloadEntity.chapters.length; i++) {
+      var chapter = downloadEntity.chapters[i];
       var directory = Directory(
           '${downloadEntity.folder}/${downloadEntity.uniqueid}/${chapter.chapter.number}');
       if (!directory.existsSync()) {
@@ -87,10 +88,20 @@ class ServiceDownload extends ChangeNotifier {
 
         // completedChapters++;
         // progress(chaptersDownload.length, completedChapters);
-        chapter.status = Status.done;
-        updateCase.update(data: downloadEntity, id: downloadEntity.uniqueid);
+        downloadEntity.chapters[i].status = Status.done;
+        updateCase.update(
+            data: DownloadEntity(
+              uniqueid: downloadEntity.uniqueid,
+              idUser: downloadEntity.idUser,
+              createAt: downloadEntity.createAt,
+              manga: downloadEntity.manga,
+              folder: downloadEntity.folder,
+              chapters: downloadEntity.chapters,
+            ),
+            id: downloadEntity.uniqueid);
       }
     }
+    notifyListeners();
   }
 
   void pauseDownload() {

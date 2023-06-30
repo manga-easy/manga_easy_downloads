@@ -6,7 +6,12 @@ import 'package:manga_easy_themes/manga_easy_themes.dart';
 class CustomAppBar extends StatefulWidget {
   final String title;
   final DownloadController ct;
-  const CustomAppBar({super.key, required this.title, required this.ct});
+  final void Function() onClean;
+  const CustomAppBar(
+      {super.key,
+      required this.title,
+      required this.ct,
+      required this.onClean});
 
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
@@ -55,7 +60,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
         PopupMenuButton(
           icon: Icon(Icons.list, color: ThemeService.of.backgroundIcon),
           itemBuilder: (context) => [
-            const PopupMenuItem(
+            PopupMenuItem(
+              onTap: widget.onClean,
               child: CoffeeText(text: 'Limpar todos os downloads'),
             ),
             PopupMenuItem(

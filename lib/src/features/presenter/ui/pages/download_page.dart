@@ -39,7 +39,20 @@ class _DownloadPageState extends State<DownloadPage> {
         child: CustomAppBar(
           title: 'Downloads',
           ct: ct,
+          onClean: () {
+            setState(() {
+              ct.deleteAllDownload();
+            });
+          },
         ),
+      ),
+      bottomNavigationBar: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            ct.create();
+          });
+        },
+        child: const Icon(Icons.add),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: ThemeService.of.backgroundIcon,
