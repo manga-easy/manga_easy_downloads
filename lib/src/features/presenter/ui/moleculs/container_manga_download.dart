@@ -19,6 +19,9 @@ class ContainerMangaDownload extends StatelessWidget {
   final bool isPaused;
   final List<ChapterStatus> listChapterTodo;
   final List<ChapterStatus> listChapterDone;
+
+  final String uniqueid;
+  final String folder;
   const ContainerMangaDownload({
     super.key,
     required this.ct,
@@ -33,6 +36,8 @@ class ContainerMangaDownload extends StatelessWidget {
     required this.listChapterDone,
     this.isDownload = false,
     this.downloadProgress = 0.0,
+    required this.uniqueid,
+    required this.folder,
   });
 
   @override
@@ -45,6 +50,8 @@ class ContainerMangaDownload extends StatelessWidget {
             ct: ct,
             name: name,
             pages: pages,
+            folder: folder,
+            uniqueid: uniqueid,
             listChapterDone: listChapterDone,
             listChapterTodo: listChapterTodo,
           ),

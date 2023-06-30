@@ -143,6 +143,8 @@ class _DownloadPageState extends State<DownloadPage> {
                             '${mangaDownload.folder}/${mangaDownload.uniqueid}'),
                         pages:
                             '${mangaDownload.chapters[idx].chapter.imagens.length}',
+                        folder: mangaDownload.folder,
+                        uniqueid: mangaDownload.uniqueid,
                       ),
                     );
                   },

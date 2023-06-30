@@ -44,6 +44,9 @@ class ListMangaDownload extends StatelessWidget {
                 megaByte: ct.calculateFolderSize(
                     '${mangaDownload.folder}/${mangaDownload.uniqueid}'),
                 pages: '${mangaDownload.chapters[idx].chapter.imagens.length}',
+                folder: mangaDownload.folder,
+                uniqueid: mangaDownload.uniqueid,
+                
               );
             },
           )

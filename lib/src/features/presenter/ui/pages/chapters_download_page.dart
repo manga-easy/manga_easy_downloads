@@ -1,27 +1,36 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/organisms/list_chapter_download.dart';
-import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
-class ChapterDownloadPage extends StatelessWidget {
+class ChapterDownloadPage extends StatefulWidget {
   final DownloadController ct;
   final String name;
   final String pages;
+  final String uniqueid;
+  final String folder;
   final List<ChapterStatus> listChapterTodo;
   final List<ChapterStatus> listChapterDone;
 
   const ChapterDownloadPage({
-    super.key,
+    Key? key,
     required this.ct,
     required this.name,
     required this.pages,
     required this.listChapterTodo,
     required this.listChapterDone,
-  });
+    required this.uniqueid,
+    required this.folder,
+  }) : super(key: key);
 
+  @override
+  State<ChapterDownloadPage> createState() => _ChapterDownloadPageState();
+}
+
+class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,9 +38,13 @@ class ChapterDownloadPage extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: const Size(double.infinity, 50),
         child: CustomAppBar(
-          title: name,
-          ct: ct,
-          onClean: () {},
+          title: widget.name,
+          ct: widget.ct,
+          onClean: () {
+            setState(() {
+              widget.ct.deleteAllChapter(widget.uniqueid, widget.folder);
+            });
+          },
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -64,7 +77,7 @@ class ChapterDownloadPage extends StatelessWidget {
         child: CustomScrollView(
           slivers: [
             SliverVisibility(
-              visible: listChapterTodo.isNotEmpty,
+              visible: widget.listChapterTodo.isNotEmpty,
               sliver: SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -74,8 +87,8 @@ class ChapterDownloadPage extends StatelessWidget {
                       typography: CoffeeTypography.title,
                     ),
                     ListChapterDownload(
-                      pages: pages,
-                      listChapter: listChapterTodo,
+                      pages: widget.pages,
+                      listChapter: widget.listChapterTodo,
                       icons: [
                         CoffeeIconButton(
                           onTap: () {},
@@ -101,8 +114,8 @@ class ChapterDownloadPage extends StatelessWidget {
                     typography: CoffeeTypography.title,
                   ),
                   ListChapterDownload(
-                    listChapter: listChapterDone,
-                    pages: pages,
+                    listChapter: widget.listChapterDone,
+                    pages: widget.pages,
                     icons: [
                       CoffeeIconButton(
                         onTap: () {},

@@ -171,6 +171,24 @@ class DownloadController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void deleteAllChapter(String id, String folder) async {
+    await deleteCase.delete(id: id);
+    final file = Directory('$folder/$id');
+    if (await file.exists()) {
+      file.deleteSync(recursive: true);
+      listDownload();
+
+      print('Pasta excluída com sucesso');
+    } else {
+      print('A pasta não existe');
+    }
+    notifyListeners();
+  }
+
+  void deleteOneChapter() async {
+    
+  }
+
   void create() async {
     //   bool permissionStatus;
     //   final deviceInfo = await DeviceInfoPlugin().androidInfo;
