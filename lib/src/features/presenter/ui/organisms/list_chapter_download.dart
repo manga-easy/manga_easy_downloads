@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_chapter_download.dart';
-import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
 class ListChapterDownload extends StatelessWidget {
   final String pages;

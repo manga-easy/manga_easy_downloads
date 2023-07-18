@@ -43,7 +43,7 @@ class ServiceDownload extends ChangeNotifier {
     for (var i = 0; i < downloadEntity.chapters.length; i++) {
       var chapter = downloadEntity.chapters[i];
       var directory = Directory(
-          '${downloadEntity.folder}/${downloadEntity.uniqueid}/${chapter.chapter.number}');
+          '${downloadEntity.folder}/Manga Easy/${downloadEntity.uniqueid}/${chapter.chapter.number}');
       if (!directory.existsSync()) {
         await directory.create(recursive: true);
       }
@@ -89,7 +89,7 @@ class ServiceDownload extends ChangeNotifier {
         // completedChapters++;
         // progress(chaptersDownload.length, completedChapters);
         downloadEntity.chapters[i].status = Status.done;
-        updateCase.update(
+        await updateCase.update(
             data: DownloadEntity(
               uniqueid: downloadEntity.uniqueid,
               idUser: downloadEntity.idUser,
