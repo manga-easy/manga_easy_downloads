@@ -10,7 +10,6 @@ import 'package:manga_easy_downloads/src/features/domain/usecases/delete_usecase
 import 'package:manga_easy_downloads/src/features/domain/usecases/get_usecase.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/list_usecase.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/update_usecase.dart';
-import 'package:manga_easy_downloads/src/features/presenter/ui/organisms/list_manga_download.dart';
 import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 import 'package:persistent_database/persistent_database.dart';
 
@@ -63,6 +62,7 @@ class DownloadController extends ChangeNotifier {
 
   void listDownload() async {
     listMangaDownloadTemp = await listCase.list();
+    print('listMangaDownloadTemp $listMangaDownloadTemp');
     print('Lista toda $listMangaDownloadTemp');
     listTodo =
         listMangaDownloadTemp.where((e) => e.status == Status.todo).toList();
@@ -86,13 +86,13 @@ class DownloadController extends ChangeNotifier {
   }
 
   double downloadProgress = 0.0;
+
   void downloadFile() async {
     try {
       listDownload();
       if (listTodo.isNotEmpty) {
         for (var todo in listTodo) {
           await _service.downloadFile(todo);
-          updateCase.update(data: todo, id: todo.uniqueid);
         }
       }
       listDownload();
@@ -101,10 +101,34 @@ class DownloadController extends ChangeNotifier {
 
       print('listTodo $listTodo');
       print('list done ${listDone.map((e) => e.manga.title).toList()}');
+      var listBanco = await listCase.list();
+      print(
+          'list do banco $listBanco, ${listBanco[0].chapters}, ${listBanco[1].chapters}');
 
       notifyListeners();
     } catch (e) {
       print(e);
+    }
+  }
+
+  void downloadManga(DownloadEntity downloadEntity) {
+    // Conferir se o manga ja tem algum existente criado pra adicionar na lista de chapter
+
+    if (listMangaDownloadTemp
+        .any((e) => e.uniqueid == downloadEntity.uniqueid)) {
+      for (var chapter in downloadEntity.chapters) {
+        // sera que vai ter um mesmo manga adicionado ? tipo no caso eu baixei 3 mangas e depois clico em baixar todos mangas
+
+        listMangaDownloadTemp
+            .firstWhere((e) => e.uniqueid == downloadEntity.uniqueid)
+            .chapters
+            .add(chapter);
+        //botar em um update isso ai pra atualizar tambem no canco local
+      }
+      //     update
+      // download.chapters.add
+    } else {
+      listMangaDownloadTemp.add(downloadEntity);
     }
   }
 
@@ -139,10 +163,10 @@ class DownloadController extends ChangeNotifier {
 
   void deleteAllDownload() async {
     for (var downloadTransfer in listTodo) {
-      final folder =
-          Directory('${downloadTransfer.folder}/${downloadTransfer.uniqueid}');
+      final folder = Directory(
+          '${downloadTransfer.folder}/Manga Easy/${downloadTransfer.uniqueid}');
 
-      await deleteCase.delete(id: downloadTransfer.uniqueid);
+      await deleteCase.delete(id: downloadTransfer.id!);
       if (await folder.exists()) {
         folder.deleteSync(recursive: true);
         listDownload();
@@ -153,9 +177,9 @@ class DownloadController extends ChangeNotifier {
     }
 
     for (var download in listDone) {
-      final folder = Directory('${download.folder}/${download.uniqueid}');
-
-      await deleteCase.delete(id: download.uniqueid);
+      final folder =
+          Directory('${download.folder}/Manga Easy/${download.uniqueid}');
+      await deleteCase.delete(id: download.id!);
       if (await folder.exists()) {
         folder.deleteSync(recursive: true);
         listDownload();
@@ -187,28 +211,7 @@ class DownloadController extends ChangeNotifier {
 
   void deleteOneChapter() async {}
 
-  void downloadManga(DownloadEntity downloadEntity) {
-    if (listMangaDownloadTemp
-        .any((e) => e.uniqueid == downloadEntity.uniqueid)) {
-      var download = listMangaDownloadTemp
-          .firstWhere((e) => e.uniqueid == downloadEntity.uniqueid);
-      //     update
-      // download.chapters.add
-    } else {
-      create();
-    }
-  }
-
   void create() async {
-    //   bool permissionStatus;
-    //   final deviceInfo = await DeviceInfoPlugin().androidInfo;
-
-    // if (deviceInfo.version.sdkInt > 32) {
-    //   permissionStatus = await Permission.photos.request().isGranted;
-    // } else {
-    //   permissionStatus = await Permission.storage.request().isGranted;
-    // }
-
     await createCase.create(
       data: DownloadEntity(
         uniqueid: "MentallyBroken",

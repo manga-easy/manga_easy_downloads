@@ -80,7 +80,7 @@ class ServiceDownload extends ChangeNotifier {
               File('${directory.path}/${image.src.split('/').last}');
           await compressFile.writeAsBytes(compressImage, mode: FileMode.write);
 
-          notifyListeners();
+          downloadEntity.chapters[i].status = Status.done;
         } catch (e) {
           chapter.status = Status.error;
           print('Deu erro no download: $e');
@@ -88,18 +88,18 @@ class ServiceDownload extends ChangeNotifier {
 
         // completedChapters++;
         // progress(chaptersDownload.length, completedChapters);
-        downloadEntity.chapters[i].status = Status.done;
-        await updateCase.update(
-            data: DownloadEntity(
-              uniqueid: downloadEntity.uniqueid,
-              idUser: downloadEntity.idUser,
-              createAt: downloadEntity.createAt,
-              manga: downloadEntity.manga,
-              folder: downloadEntity.folder,
-              chapters: downloadEntity.chapters,
-            ),
-            id: downloadEntity.uniqueid);
       }
+      await updateCase.update(
+        data: DownloadEntity(
+          uniqueid: downloadEntity.uniqueid,
+          idUser: downloadEntity.idUser,
+          createAt: downloadEntity.createAt,
+          manga: downloadEntity.manga,
+          folder: downloadEntity.folder,
+          chapters: downloadEntity.chapters,
+        ),
+        id: downloadEntity.id!,
+      );
     }
     notifyListeners();
   }

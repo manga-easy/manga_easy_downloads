@@ -20,13 +20,12 @@ class DownloadEntity {
   });
 
   Status get status {
-    if (chapters.map((e) => e.status).toList().contains(Status.doing)) {
-      return Status.doing;
-    }
+    // if (chapters.any((e) => e.status == Status.doing)) {
+    //   return Status.doing;
+    // }
     if (chapters.any((e) => e.status == Status.todo)) {
       return Status.todo;
     }
-
     return Status.done;
   }
 }
