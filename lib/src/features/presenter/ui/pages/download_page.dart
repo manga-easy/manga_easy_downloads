@@ -46,13 +46,13 @@ class _DownloadPageState extends State<DownloadPage> {
           },
         ),
       ),
-      bottomNavigationBar: FloatingActionButton(
-        onPressed: () {
+      bottomNavigationBar: CoffeeButton(
+        label: 'add',
+        onPress: () {
           setState(() {
             ct.create();
           });
         },
-        child: const Icon(Icons.add),
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: ThemeService.of.backgroundIcon,
