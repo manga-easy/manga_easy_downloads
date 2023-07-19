@@ -131,20 +131,15 @@ class _DownloadPageState extends State<DownloadPage> {
                       child: ContainerMangaDownload(
                         listChapterDone: chapterStatusDone,
                         listChapterTodo: chapterStatusTodo,
+                        mangaDownload: mangaDownload,
                         isDownload: true,
                         downloadProgress: ct.downloadProgress,
                         ct: ct,
-                        name: mangaDownload.manga.title,
-                        host: 'Manga easy Originals',
                         isPaused: ct.isPaused,
-                        chaptersDownload: '${mangaDownload.chapters.length}',
-                        imageManga: mangaDownload.manga.capa,
                         megaByte: ct.calculateFolderSize(
                             '${mangaDownload.folder}/Manga Easy/${mangaDownload.uniqueid}'),
                         pages:
                             '${mangaDownload.chapters[idx].chapter.imagens.length}',
-                        folder: mangaDownload.folder,
-                        uniqueid: mangaDownload.uniqueid,
                       ),
                     );
                   },

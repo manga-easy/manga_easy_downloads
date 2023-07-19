@@ -89,6 +89,7 @@ class ServiceDownload extends ChangeNotifier {
         // completedChapters++;
         // progress(chaptersDownload.length, completedChapters);
       }
+     //Colocar como um copywith
       await updateCase.update(
         data: DownloadEntity(
           uniqueid: downloadEntity.uniqueid,

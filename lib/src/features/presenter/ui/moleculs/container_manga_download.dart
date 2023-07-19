@@ -6,12 +6,7 @@ import 'package:manga_easy_downloads/src/features/presenter/ui/pages/chapters_do
 import 'package:manga_easy_themes/manga_easy_themes.dart';
 
 class ContainerMangaDownload extends StatelessWidget {
-  final String imageManga;
-  final String name;
-  final String chaptersDownload;
-  final String host;
   final String megaByte;
-
   final String pages;
   final double downloadProgress;
   final DownloadController ct;
@@ -19,16 +14,10 @@ class ContainerMangaDownload extends StatelessWidget {
   final bool isPaused;
   final List<ChapterStatus> listChapterTodo;
   final List<ChapterStatus> listChapterDone;
-
-  final String uniqueid;
-  final String folder;
+  final DownloadEntity mangaDownload;
   const ContainerMangaDownload({
     super.key,
     required this.ct,
-    required this.imageManga,
-    required this.name,
-    required this.chaptersDownload,
-    required this.host,
     required this.megaByte,
     required this.pages,
     required this.isPaused,
@@ -36,8 +25,7 @@ class ContainerMangaDownload extends StatelessWidget {
     required this.listChapterDone,
     this.isDownload = false,
     this.downloadProgress = 0.0,
-    required this.uniqueid,
-    required this.folder,
+    required this.mangaDownload,
   });
 
   @override
@@ -48,12 +36,10 @@ class ContainerMangaDownload extends StatelessWidget {
         MaterialPageRoute(
           builder: (context) => ChapterDownloadPage(
             ct: ct,
-            name: name,
             pages: pages,
-            folder: folder,
-            uniqueid: uniqueid,
-            listChapterDone: listChapterDone,
             listChapterTodo: listChapterTodo,
+            mangaDownload: mangaDownload,
+            listChapterDone: listChapterDone,
           ),
         ),
       ),
@@ -63,7 +49,7 @@ class ContainerMangaDownload extends StatelessWidget {
           child: Row(
             children: [
               CoffeeMangaCover(
-                cover: imageManga,
+                cover: mangaDownload.manga.capa,
                 width: 125,
                 filtraImg: true,
               ),
@@ -77,18 +63,21 @@ class ContainerMangaDownload extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CoffeeText(
-                          text: name,
+                          text: mangaDownload.manga.title,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           typography: CoffeeTypography.title,
                         ),
-                        chaptersDownload == '1'
+                        '${mangaDownload.chapters.length}' == '1'
                             ? CoffeeText(
-                                text: '$chaptersDownload capítulo baixado')
+                                text:
+                                    '${mangaDownload.chapters.length} capítulo baixado')
                             : CoffeeText(
-                                text: '$chaptersDownload capítulos baixados'),
+                                text:
+                                    '${mangaDownload.chapters.length} capítulos baixados'),
                         CoffeeText(
-                          text: host,
+                          
+                          text: 'Host a modificar no container manga',
                           color:
                               ThemeService.of.backgroundText.withOpacity(0.5),
                         ),

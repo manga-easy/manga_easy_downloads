@@ -162,15 +162,13 @@ class DownloadController extends ChangeNotifier {
   }
 
   void deleteAllDownload() async {
+    await deleteAllCase.deleteAll();
     for (var downloadTransfer in listTodo) {
       final folder = Directory(
           '${downloadTransfer.folder}/Manga Easy/${downloadTransfer.uniqueid}');
 
-      await deleteCase.delete(id: downloadTransfer.id!);
       if (await folder.exists()) {
         folder.deleteSync(recursive: true);
-        listDownload();
-        notifyListeners();
       } else {
         print('A pasta não existe');
       }
@@ -182,30 +180,27 @@ class DownloadController extends ChangeNotifier {
       await deleteCase.delete(id: download.id!);
       if (await folder.exists()) {
         folder.deleteSync(recursive: true);
-        listDownload();
-        notifyListeners();
-
         print('Pasta excluída com sucesso');
       } else {
         print('A pasta não existe');
       }
     }
-    print(listTodo.first.uniqueid);
+
     listDownload();
     notifyListeners();
   }
 
-  void deleteAllChapter(String id, String folder) async {
-    await deleteCase.delete(id: id);
-    final file = Directory('$folder/$id');
+  void deleteAllChapter({required DownloadEntity downloadEntity}) async {
+    await deleteCase.delete(id: downloadEntity.id!);
+    final file = Directory(
+        '${downloadEntity.folder}/Manga Easy/${downloadEntity.uniqueid}');
     if (await file.exists()) {
       file.deleteSync(recursive: true);
-      listDownload();
-
       print('Pasta excluída com sucesso');
     } else {
       print('A pasta não existe');
     }
+    listDownload();
     notifyListeners();
   }
 

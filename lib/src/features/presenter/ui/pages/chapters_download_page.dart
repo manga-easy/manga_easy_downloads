@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
@@ -7,22 +8,16 @@ import 'package:manga_easy_downloads/src/features/presenter/ui/organisms/list_ch
 
 class ChapterDownloadPage extends StatefulWidget {
   final DownloadController ct;
-  final String name;
   final String pages;
-  final String uniqueid;
-  final String folder;
+  final DownloadEntity mangaDownload;
   final List<ChapterStatus> listChapterTodo;
   final List<ChapterStatus> listChapterDone;
-
   const ChapterDownloadPage({
     Key? key,
     required this.ct,
-    required this.name,
     required this.pages,
     required this.listChapterTodo,
-    required this.listChapterDone,
-    required this.uniqueid,
-    required this.folder,
+    required this.listChapterDone, required this.mangaDownload,
   }) : super(key: key);
 
   @override
@@ -37,11 +32,11 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
       appBar: PreferredSize(
         preferredSize: const Size(double.infinity, 50),
         child: CustomAppBar(
-          title: widget.name,
+          title: widget.mangaDownload.manga.title,
           ct: widget.ct,
           onClean: () {
             setState(() {
-              widget.ct.deleteAllChapter(widget.uniqueid, widget.folder);
+              widget.ct.deleteAllChapter(downloadEntity: widget.mangaDownload);
             });
           },
         ),

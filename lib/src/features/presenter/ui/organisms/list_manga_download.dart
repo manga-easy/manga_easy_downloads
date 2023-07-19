@@ -35,17 +35,12 @@ class ListMangaDownload extends StatelessWidget {
               return ContainerMangaDownload(
                 listChapterDone: chapterStatusDone,
                 listChapterTodo: chapterStatusTodo,
+                mangaDownload: mangaDownload,
                 ct: ct,
                 isPaused: ct.isPaused,
-                name: mangaDownload.manga.title,
-                host: 'Manga easy Originals',
-                chaptersDownload: '${mangaDownload.chapters.length}',
-                imageManga: mangaDownload.manga.capa,
                 megaByte: ct.calculateFolderSize(
                     '${mangaDownload.folder}/Manga Easy/${mangaDownload.uniqueid}'),
                 pages: '${mangaDownload.chapters[idx].chapter.imagens.length}',
-                folder: mangaDownload.folder,
-                uniqueid: mangaDownload.uniqueid,
               );
             },
           )

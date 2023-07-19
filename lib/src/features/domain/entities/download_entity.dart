@@ -1,3 +1,4 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
 class DownloadEntity {
@@ -27,6 +28,26 @@ class DownloadEntity {
       return Status.todo;
     }
     return Status.done;
+  }
+
+  DownloadEntity copyWith({
+    String? id,
+    String? uniqueid,
+    int? idUser,
+    String? folder,
+    Manga? manga,
+    List<ChapterStatus>? chapters,
+    DateTime? createAt,
+  }) {
+    return DownloadEntity(
+      id: id ?? this.id,
+      uniqueid: uniqueid ?? this.uniqueid,
+      idUser: idUser ?? this.idUser,
+      folder: folder ?? this.folder,
+      manga: manga ?? this.manga,
+      chapters: chapters ?? this.chapters,
+      createAt: createAt ?? this.createAt,
+    );
   }
 }
 
