@@ -2,27 +2,19 @@ import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
-import 'package:manga_easy_downloads/src/features/presenter/ui/pages/chapters_download_page.dart';
+
 import 'package:manga_easy_themes/manga_easy_themes.dart';
 
 class ContainerMangaDownload extends StatelessWidget {
-  final String megaByte;
-  final String pages;
   final double downloadProgress;
   final DownloadController ct;
   final bool isDownload;
   final bool isPaused;
-  final List<ChapterStatus> listChapterTodo;
-  final List<ChapterStatus> listChapterDone;
   final DownloadEntity mangaDownload;
   const ContainerMangaDownload({
     super.key,
     required this.ct,
-    required this.megaByte,
-    required this.pages,
     required this.isPaused,
-    required this.listChapterTodo,
-    required this.listChapterDone,
     this.isDownload = false,
     this.downloadProgress = 0.0,
     required this.mangaDownload,
@@ -31,17 +23,10 @@ class ContainerMangaDownload extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.push(
+      onTap: () => Navigator.pushNamed(
         context,
-        MaterialPageRoute(
-          builder: (context) => ChapterDownloadPage(
-            ct: ct,
-            pages: pages,
-            listChapterTodo: listChapterTodo,
-            mangaDownload: mangaDownload,
-            listChapterDone: listChapterDone,
-          ),
-        ),
+        '/chapters-download',
+        arguments: mangaDownload,
       ),
       child: CoffeeContainer(
         child: SizedBox(
@@ -76,13 +61,13 @@ class ContainerMangaDownload extends StatelessWidget {
                                 text:
                                     '${mangaDownload.chapters.length} capítulos baixados'),
                         CoffeeText(
-                          
                           text: 'Host a modificar no container manga',
                           color:
                               ThemeService.of.backgroundText.withOpacity(0.5),
                         ),
                         CoffeeText(
-                          text: megaByte,
+                          text: ct.calculateFolderSize(
+                              '${mangaDownload.folder}/Manga Easy/${mangaDownload.uniqueid}'),
                           color:
                               ThemeService.of.backgroundText.withOpacity(0.5),
                         ),

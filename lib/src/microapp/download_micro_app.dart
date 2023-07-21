@@ -16,6 +16,7 @@ import 'package:manga_easy_downloads/src/features/domain/usecases/implements/lis
 import 'package:manga_easy_downloads/src/features/domain/usecases/implements/update_usecase_imp.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/list_usecase.dart';
 import 'package:manga_easy_downloads/src/features/domain/usecases/update_usecase.dart';
+import 'package:manga_easy_downloads/src/features/presenter/controllers/chapter_download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/pages/download_page.dart';
 import 'package:manga_easy_routes/manga_easy_routes.dart';
@@ -64,6 +65,11 @@ class DownloadMicroApp extends MicroApp {
         getIt(),
         getIt(),
         getIt(),
+        getIt(),
+      ),
+    );
+    getIt.registerFactory(
+      () => ChapterDownloadController(
         getIt(),
       ),
     );

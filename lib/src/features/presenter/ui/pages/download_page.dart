@@ -1,7 +1,6 @@
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_manga_download.dart';
@@ -38,12 +37,20 @@ class _DownloadPageState extends State<DownloadPage> {
         preferredSize: const Size(double.infinity, 50),
         child: CustomAppBar(
           title: 'Downloads',
-          ct: ct,
-          onClean: () {
-            setState(() {
-              ct.deleteAllDownload();
-            });
-          },
+          listPopMenu: [
+            PopupMenuItem(
+              onTap: () {
+                setState(() {
+                  ct.deleteAllDownload();
+                });
+              },
+              child: const CoffeeText(text: 'Limpar todos os downloads'),
+            ),
+            PopupMenuItem(
+              onTap: () => ct.pickDirectory(),
+              child: const CoffeeText(text: 'Escolher pasta para download'),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: CoffeeButton(
@@ -120,26 +127,14 @@ class _DownloadPageState extends State<DownloadPage> {
                   childCount: ct.listTodo.length,
                   (context, idx) {
                     var mangaDownload = ct.listTodo[idx];
-                    var chapterStatusDone = mangaDownload.chapters
-                        .where((element) => element.status == Status.done)
-                        .toList();
-                    var chapterStatusTodo = mangaDownload.chapters
-                        .where((element) => element.status == Status.todo)
-                        .toList();
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 5),
                       child: ContainerMangaDownload(
-                        listChapterDone: chapterStatusDone,
-                        listChapterTodo: chapterStatusTodo,
                         mangaDownload: mangaDownload,
                         isDownload: true,
                         downloadProgress: ct.downloadProgress,
                         ct: ct,
                         isPaused: ct.isPaused,
-                        megaByte: ct.calculateFolderSize(
-                            '${mangaDownload.folder}/Manga Easy/${mangaDownload.uniqueid}'),
-                        pages:
-                            '${mangaDownload.chapters[idx].chapter.imagens.length}',
                       ),
                     );
                   },

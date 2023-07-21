@@ -1,30 +1,26 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
-import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
+import 'package:manga_easy_downloads/src/features/presenter/controllers/chapter_download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/organisms/list_chapter_download.dart';
 
 class ChapterDownloadPage extends StatefulWidget {
-  final DownloadController ct;
-  final String pages;
+  static const route = '/chapters-download';
+
   final DownloadEntity mangaDownload;
-  final List<ChapterStatus> listChapterTodo;
-  final List<ChapterStatus> listChapterDone;
-  const ChapterDownloadPage({
-    Key? key,
-    required this.ct,
-    required this.pages,
-    required this.listChapterTodo,
-    required this.listChapterDone, required this.mangaDownload,
-  }) : super(key: key);
+
+  const ChapterDownloadPage({super.key, required this.mangaDownload});
 
   @override
   State<ChapterDownloadPage> createState() => _ChapterDownloadPageState();
 }
 
 class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
+  ChapterDownloadController ct = GetIt.I();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,12 +29,16 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
         preferredSize: const Size(double.infinity, 50),
         child: CustomAppBar(
           title: widget.mangaDownload.manga.title,
-          ct: widget.ct,
-          onClean: () {
-            setState(() {
-              widget.ct.deleteAllChapter(downloadEntity: widget.mangaDownload);
-            });
-          },
+          listPopMenu: [
+            PopupMenuItem(
+              onTap: () {
+                setState(() {
+                  ct.deleteAllChapter(downloadEntity: widget.mangaDownload);
+                });
+              },
+              child: const CoffeeText(text: 'Limpar todos os downloads'),
+            ),
+          ],
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
@@ -71,7 +71,10 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
         child: CustomScrollView(
           slivers: [
             SliverVisibility(
-              visible: widget.listChapterTodo.isNotEmpty,
+              visible: widget.mangaDownload.chapters
+                  .where((element) => element.status == Status.todo)
+                  .toList()
+                  .isNotEmpty,
               sliver: SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -81,8 +84,9 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                       typography: CoffeeTypography.title,
                     ),
                     ListChapterDownload(
-                      pages: widget.pages,
-                      listChapter: widget.listChapterTodo,
+                      listChapter: widget.mangaDownload.chapters
+                          .where((element) => element.status == Status.todo)
+                          .toList(),
                       icons: [
                         CoffeeIconButton(
                           onTap: () {},
@@ -108,8 +112,9 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                     typography: CoffeeTypography.title,
                   ),
                   ListChapterDownload(
-                    listChapter: widget.listChapterDone,
-                    pages: widget.pages,
+                    listChapter: widget.mangaDownload.chapters
+                        .where((element) => element.status == Status.done)
+                        .toList(),
                     icons: [
                       CoffeeIconButton(
                         onTap: () {},

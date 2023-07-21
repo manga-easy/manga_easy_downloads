@@ -190,21 +190,7 @@ class DownloadController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteAllChapter({required DownloadEntity downloadEntity}) async {
-    await deleteCase.delete(id: downloadEntity.id!);
-    final file = Directory(
-        '${downloadEntity.folder}/Manga Easy/${downloadEntity.uniqueid}');
-    if (await file.exists()) {
-      file.deleteSync(recursive: true);
-      print('Pasta excluída com sucesso');
-    } else {
-      print('A pasta não existe');
-    }
-    listDownload();
-    notifyListeners();
-  }
 
-  void deleteOneChapter() async {}
 
   void create() async {
     await createCase.create(

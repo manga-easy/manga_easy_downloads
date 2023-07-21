@@ -1,17 +1,14 @@
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
-import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_themes/manga_easy_themes.dart';
 
 class CustomAppBar extends StatefulWidget {
   final String title;
-  final DownloadController ct;
-  final void Function() onClean;
+
+  final List<PopupMenuEntry<dynamic>> listPopMenu;
+
   const CustomAppBar(
-      {super.key,
-      required this.title,
-      required this.ct,
-      required this.onClean});
+      {super.key, required this.title, required this.listPopMenu});
 
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
@@ -58,18 +55,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 },
               ),
         PopupMenuButton(
-          icon: Icon(Icons.list, color: ThemeService.of.backgroundIcon),
-          itemBuilder: (context) => [
-            PopupMenuItem(
-              onTap: widget.onClean,
-              child: CoffeeText(text: 'Limpar todos os downloads'),
-            ),
-            PopupMenuItem(
-              onTap: () => widget.ct.pickDirectory(),
-              child: CoffeeText(text: 'Escolher pasta para download'),
-            )
-          ],
-        )
+            icon: Icon(Icons.list, color: ThemeService.of.backgroundIcon),
+            itemBuilder: (context) => widget.listPopMenu)
       ],
     );
   }
