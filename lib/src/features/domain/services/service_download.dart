@@ -50,10 +50,10 @@ class ServiceDownload extends ChangeNotifier {
       List<ImageChapter> imagensDownload = chapter.chapter.imagens;
       if (chapter.status == Status.done) continue;
       for (var image in imagensDownload) {
-        // if (File('${directory.path}/${image.src.split('/').last}')
-        //     .existsSync()) {
-        //   continue;
-        // }
+        if (File('${directory.path}/${image.src.split('/').last}')
+            .existsSync()) {
+          continue;
+        }
         try {
           final response = await dio.get(
             image.src,
