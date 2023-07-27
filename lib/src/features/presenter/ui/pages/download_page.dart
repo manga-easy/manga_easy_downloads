@@ -9,7 +9,7 @@ import 'package:manga_easy_themes/manga_easy_themes.dart';
 import 'package:reorderables/reorderables.dart';
 
 class DownloadPage extends StatefulWidget {
-  static const route = '/downloads';
+  static const route = '/downloads-v2';
   const DownloadPage({super.key});
 
   @override
@@ -52,14 +52,6 @@ class _DownloadPageState extends State<DownloadPage> {
             ),
           ],
         ),
-      ),
-      bottomNavigationBar: CoffeeButton(
-        label: 'add',
-        onPress: () {
-          setState(() {
-            ct.create();
-          });
-        },
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: ThemeService.of.backgroundIcon,

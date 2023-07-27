@@ -4,10 +4,10 @@ import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 class DownloadEntity {
   String? id;
   String uniqueid;
-  int idUser;
+  String? idUser;
   String folder;
   Manga manga;
-  List<ChapterStatus> chapters;
+  List<ChapterStatusEntity> chapters;
   DateTime createAt;
 
   DownloadEntity({
@@ -33,10 +33,10 @@ class DownloadEntity {
   DownloadEntity copyWith({
     String? id,
     String? uniqueid,
-    int? idUser,
+    String? idUser,
     String? folder,
     Manga? manga,
-    List<ChapterStatus>? chapters,
+    List<ChapterStatusEntity>? chapters,
     DateTime? createAt,
   }) {
     return DownloadEntity(
@@ -53,9 +53,10 @@ class DownloadEntity {
 
 enum Status { todo, doing, paused, done, error }
 
-class ChapterStatus {
+class ChapterStatusEntity {
+  final String uniqueid;
   final Chapter chapter;
   Status status;
 
-  ChapterStatus(this.chapter, this.status);
+  ChapterStatusEntity(this.chapter, this.status, this.uniqueid);
 }

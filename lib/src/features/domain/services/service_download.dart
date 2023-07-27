@@ -1,29 +1,81 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:hosts/hosts.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
-import 'package:manga_easy_downloads/src/features/domain/usecases/create_usecase.dart';
-import 'package:manga_easy_downloads/src/features/domain/usecases/delete_all_usecase.dart';
-import 'package:manga_easy_downloads/src/features/domain/usecases/delete_usecase.dart';
-import 'package:manga_easy_downloads/src/features/domain/usecases/get_usecase.dart';
-import 'package:manga_easy_downloads/src/features/domain/usecases/list_usecase.dart';
-import 'package:manga_easy_downloads/src/features/domain/usecases/update_usecase.dart';
 import 'package:manga_easy_sdk/manga_easy_sdk.dart';
+import 'package:persistent_database/persistent_database.dart';
+import 'package:permission_handler/permission_handler.dart' as handler;
 
 class ServiceDownload extends ChangeNotifier {
-  final CreateUsecase createCase;
-  final UpdateUsecase updateCase;
-  final DeleteUsecase deleteCase;
-  final DeleteAllUsecase deleteAllCase;
-  final GetUsecase getCase;
-  final ListUsecase listCase;
-  //final ClientDio client;
-  final dio = Dio();
-  double downloadProgress = 0.0;
+  final Preference _preference;
 
-  ServiceDownload(this.createCase, this.updateCase, this.deleteCase,
-      this.deleteAllCase, this.getCase, this.listCase);
+  ServiceDownload(
+    this._preference,
+  );
+
+  final _downloadQueue = <ChapterStatusEntity>[];
+  bool isDownloading = false;
+  double downloadProgress = 0.0;
+  String? path;
+
+  ChapterStatusEntity? _currentChapter;
+
+  bool isCurrentChapter(Chapter chapter, String uniqueid) {
+    final current = _currentChapter;
+    if (current == null) {
+      return false;
+    }
+    if (current.uniqueid != uniqueid) {
+      return false;
+    }
+    return current.chapter.title == chapter.title;
+  }
+
+  bool isChapterInQueue(Chapter chapter, String uniqueid) {
+    if (_downloadQueue.isEmpty) {
+      return false;
+    }
+    final index = _downloadQueue.indexWhere(
+      (element) =>
+          element.uniqueid == uniqueid &&
+          element.chapter.title == chapter.title,
+    );
+
+    return index != -1;
+  }
+
+  // Adiciona um URL à fila de downloads
+  void enqueueDownload(Chapter chapter, String uniqueid) {
+    _downloadQueue.add(ChapterStatusEntity(chapter, Status.doing, uniqueid));
+    _downloadNext();
+    notifyListeners();
+  }
+
+  void removeChapter(Chapter chapter, String uniqueid) {
+    _downloadQueue.removeWhere(
+      (element) =>
+          element.uniqueid == uniqueid &&
+          element.chapter.title == chapter.title,
+    );
+    notifyListeners();
+  }
+
+  // Realiza o download do próximo item na fila
+  void _downloadNext() {
+    if (isDownloading || _downloadQueue.isEmpty) return;
+
+    final chapter = _downloadQueue.first;
+    _downloadChapter(chapter).then((_) {
+      isDownloading = false;
+      _downloadNext();
+    });
+    isDownloading = true;
+    notifyListeners();
+  }
 
   CancelToken cancelToken = CancelToken();
 
@@ -33,42 +85,47 @@ class ServiceDownload extends ChangeNotifier {
 
   void progress(int totalImages, int completedImages) {
     downloadProgress = getDownloadProgress(totalImages, completedImages);
+    Helps.log('Progress idication $downloadProgress');
     notifyListeners();
   }
 
-  Future<void> downloadFile(DownloadEntity downloadEntity) async {
-    // int completedChapters = 0;
-    //ler a lista de capitulos
+  Future<void> _downloadChapter(ChapterStatusEntity chapter) async {
+    try {
+      _currentChapter = chapter;
+      path ??= await FilePicker.platform.getDirectoryPath();
 
-    for (var i = 0; i < downloadEntity.chapters.length; i++) {
-      var chapter = downloadEntity.chapters[i];
       var directory = Directory(
-          '${downloadEntity.folder}/Manga Easy/${downloadEntity.uniqueid}/${chapter.chapter.number}');
+        '$path/manga-easy/${chapter.uniqueid}/${chapter.chapter.number}',
+      );
+
       if (!directory.existsSync()) {
-        await directory.create(recursive: true);
-      }
-      List<ImageChapter> imagensDownload = chapter.chapter.imagens;
-      if (chapter.status == Status.done) continue;
-      for (var image in imagensDownload) {
-        if (File('${directory.path}/${image.src.split('/').last}')
-            .existsSync()) {
-          continue;
+        var status = await handler.Permission.storage.request();
+        if (status.isGranted) {
+          await directory.create(recursive: true);
         }
+      }
+      final host = ApiManga.getByID(
+        host: HostModel.empty()..host = 'http://api.lucas-cm.com.br',
+        headers: Global.header,
+      );
+      final images = await host.getConteudoChapter(manga: chapter.chapter.href);
+      var totalDone = 0;
+      for (var image in images) {
         try {
-          final response = await dio.get(
+          progress(images.length, totalDone);
+          totalDone += 1;
+          final file = File('${directory.path}/${image.src.split('/').last}');
+          if (file.existsSync()) {
+            continue;
+          }
+
+          final response = await Dio().get(
             image.src,
             options: Options(
-              headers: {
-                'Authorization':
-                    'Bearer eyJhbGciOiJIUzUxMiJ9.eyJSb2xlIjoiQWRtaW4iLCJJc3N1ZXIiOiJJc3N1ZXIiLCJVc2VybmFtZSI6IkphdmFJblVzZSIsImV4cCI6MTY1MTUxMDgwNCwiaWF0IjoxNjUxNTEwODA0fQ.q2iOBcQjNvQJXtw32zsYP6m0NLV2Pboxto92xa5t-R__HWzn2m8wc5f9uAfZof76xAaY6eZYuuGtU_lIjxusvQ',
-              },
+              headers: Global.header,
               responseType: ResponseType.bytes,
             ),
             cancelToken: cancelToken,
-            onReceiveProgress: (received, total) {
-              int percentage = ((received / total) * 100).floor();
-              print('$percentage%');
-            },
           );
 
           final fileBytes = response.data;
@@ -76,43 +133,25 @@ class ServiceDownload extends ChangeNotifier {
             fileBytes,
             quality: 20,
           );
-          var compressFile =
-              File('${directory.path}/${image.src.split('/').last}');
-          await compressFile.writeAsBytes(compressImage, mode: FileMode.write);
-
-          downloadEntity.chapters[i].status = Status.done;
+          //quando quebrar o bovinão arruma
+          await file.writeAsBytes(compressImage, mode: FileMode.write);
         } catch (e) {
-          chapter.status = Status.error;
           print('Deu erro no download: $e');
         }
-
-        // completedChapters++;
-        // progress(chaptersDownload.length, completedChapters);
       }
-     //Colocar como um copywith
-      await updateCase.update(
-        data: DownloadEntity(
-          uniqueid: downloadEntity.uniqueid,
-          idUser: downloadEntity.idUser,
-          createAt: downloadEntity.createAt,
-          manga: downloadEntity.manga,
-          folder: downloadEntity.folder,
-          chapters: downloadEntity.chapters,
-        ),
-        id: downloadEntity.id!,
-      );
+      notifyListeners();
+      chapter.status = Status.done;
+      _currentChapter = null;
+      _downloadQueue.remove(chapter);
+    } catch (e) {
+      chapter.status = Status.error;
+      _downloadQueue.remove(chapter);
+      isDownloading = false;
+      Helps.log(e);
     }
-    notifyListeners();
   }
 
   void pauseDownload() {
     cancelToken.cancel();
   }
-
-  // void resumeDownload(DownloadEntity downloadEntity) {
-  //   cancelToken = CancelToken();
-  //   downloadFile(downloadEntity);
-  // }
-  // Future<void> delete() {
-  // }
 }

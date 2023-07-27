@@ -12,10 +12,12 @@ class DownloadMapper {
       manga: Manga.fromJson(json['manga']),
       chapters: (json['chapters'] as List)
           .map(
-            (e) => ChapterStatus(
-                Chapter.fromJson(e['chapter']),
-                Status.values.firstWhere(
-                    (s) => s.toString().split('.').last == e['status'])),
+            (e) => ChapterStatusEntity(
+              Chapter.fromJson(e['chapter']),
+              Status.values.firstWhere(
+                  (s) => s.toString().split('.').last == e['status']),
+              e['uniqueid'],
+            ),
           )
           .toList(),
     );
@@ -30,7 +32,11 @@ class DownloadMapper {
       'folder': data.folder,
       'manga': data.manga.toJson(),
       'chapters': data.chapters
-          .map((e) => {'chapter': e.chapter.toJson(), 'status': e.status.name})
+          .map((e) => {
+                'chapter': e.chapter.toJson(),
+                'status': e.status.name,
+                'uniqueid': e.uniqueid,
+              })
           .toList(),
     };
   }

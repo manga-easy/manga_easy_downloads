@@ -3,12 +3,10 @@ import 'package:manga_easy_downloads/src/features/domain/entities/download_entit
 import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_chapter_download.dart';
 
 class ListChapterDownload extends StatelessWidget {
-  final List<ChapterStatus> listChapter;
+  final List<ChapterStatusEntity> listChapter;
   final List<Widget> icons;
   const ListChapterDownload(
-      {super.key,
-      required this.icons,
-      required this.listChapter});
+      {super.key, required this.icons, required this.listChapter});
 
   @override
   Widget build(BuildContext context) {

@@ -47,17 +47,12 @@ class DownloadMicroApp extends MicroApp {
     getIt.registerFactory<GetUsecase>(() => GetUsecaseImp(getIt()));
     getIt.registerFactory<ListUsecase>(() => ListUsecaseImp(getIt()));
 
-//Service
-    getIt.registerFactory(() => ServiceDownload(
-          getIt(),
-          getIt(),
-          getIt(),
-          getIt(),
-          getIt(),
+    //Service
+    getIt.registerLazySingleton(() => ServiceDownload(
           getIt(),
         ));
 
-//Controller
+    //Controller
     getIt.registerFactory(
       () => DownloadController(
         getIt(),
