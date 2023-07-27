@@ -4,47 +4,50 @@ import 'package:manga_easy_downloads/src/features/domain/repositories/download_r
 import 'package:persistent_database/persistent_database.dart';
 
 class DownloadRepositoryImp implements DownloadRepository {
-  final DownloadMapper mapper;
-  final PersistentDatabaseSembast db;
+  final DownloadMapper _mapper;
+  final PersistentDatabaseSembast _database;
+
   DownloadRepositoryImp(
-    this.mapper,
-    this.db,
+    this._mapper,
+    this._database,
   );
+
   final store = StoreSembast.download;
 
   @override
-  Future<String> create({required DownloadEntity data}) async {
-    var result = await db.create(objeto: mapper.toJson(data), store: store);
-    return result;
+  Future<void> update({
+    required DownloadEntity data,
+    required String uniqueid,
+  }) async {
+    await _database.update(
+      objeto: _mapper.toJson(data),
+      store: store,
+      id: uniqueid,
+    );
   }
 
   @override
-  Future<void> update(
-      {required DownloadEntity data, required String id}) async {
-    await db.update(objeto: mapper.toJson(data), store: store, id: id);
-  }
-
-  @override
-  Future<void> delete({required String id}) async {
-    await db.delete(id: id, store: store);
+  Future<void> delete({required String uniqueid}) async {
+    await _database.delete(id: uniqueid, store: store);
   }
 
   @override
   Future<void> deleteAll() async {
-    await db.deleteAll(store: store);
+    await _database.deleteAll(store: store);
   }
 
   @override
-  Future<DownloadEntity> get({required String id}) async {
-    var result = await db.get(id: id, store: store);
-    var convert = mapper.fromJson(result!);
-    return convert;
+  Future<DownloadEntity?> get({required String uniqueid}) async {
+    final result = await _database.get(id: uniqueid, store: store);
+    if (result == null) {
+      return null;
+    }
+    return _mapper.fromJson(result);
   }
 
   @override
   Future<List<DownloadEntity>> list() async {
-    var result = await db.list(store: store);
-    var convert = result.map((e) => mapper.fromJson(e)).toList();
-    return convert;
+    final result = await _database.list(store: store);
+    return result.map((e) => _mapper.fromJson(e)).toList();
   }
 }
