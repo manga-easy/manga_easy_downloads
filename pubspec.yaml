@@ -15,9 +15,9 @@ dependencies:
       url: https://github.com/manga-easy/manga_easy_sdk.git
       ref: v1.3.0
   coffee_cup:
-    git:
-      url: https://github.com/manga-easy/manga_easy_coffee_cup.git
-      ref: v1.2.0
+    path: ../manga_easy_coffee_cup
+  hosts:
+    path: ../lib_hosts
   # client_driver:
   #   git:
   #     url: https://github.com/manga-easy/manga_easy_client_driver.git
@@ -43,7 +43,11 @@ dependencies:
   flutter_image_compress: ^2.0.3
   dio: ^5.2.1+1
   permission_handler: ^10.3.0
-
+dependency_overrides: 
+  manga_easy_sdk:
+    git:
+      url: https://github.com/manga-easy/manga_easy_sdk.git
+      ref: v1.4.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
