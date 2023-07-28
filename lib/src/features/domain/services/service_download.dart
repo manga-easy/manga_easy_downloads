@@ -6,15 +6,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:hosts/hosts.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
+import 'package:manga_easy_downloads/src/features/domain/repositories/download_repository.dart';
 import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 import 'package:persistent_database/persistent_database.dart';
 import 'package:permission_handler/permission_handler.dart' as handler;
 
 class ServiceDownload extends ChangeNotifier {
   final Preference _preference;
+  final DownloadRepository _downloadRepository;
 
   ServiceDownload(
     this._preference,
+    this._downloadRepository,
   );
 
   final _downloadQueue = <ChapterStatusEntity>[];
@@ -115,6 +118,7 @@ class ServiceDownload extends ChangeNotifier {
           progress(images.length, totalDone);
           totalDone += 1;
           final file = File('${directory.path}/${image.src.split('/').last}');
+          image.path = file.path;
           if (file.existsSync()) {
             continue;
           }
@@ -135,23 +139,36 @@ class ServiceDownload extends ChangeNotifier {
           );
           //quando quebrar o bovinão arruma
           await file.writeAsBytes(compressImage, mode: FileMode.write);
+          chapter.chapter.imagens.add(image);
         } catch (e) {
           print('Deu erro no download: $e');
         }
       }
-      notifyListeners();
       chapter.status = Status.done;
-      _currentChapter = null;
-      _downloadQueue.remove(chapter);
     } catch (e) {
       chapter.status = Status.error;
-      _downloadQueue.remove(chapter);
-      isDownloading = false;
       Helps.log(e);
     }
+    _currentChapter = null;
+    isDownloading = false;
+    await saveChapter(chapter);
+    _downloadQueue.remove(chapter);
+    notifyListeners();
   }
 
   void pauseDownload() {
     cancelToken.cancel();
+  }
+
+  Future<void> saveChapter(ChapterStatusEntity chapter) async {
+    final download = await _downloadRepository.get(uniqueid: chapter.uniqueid);
+    download!.chapters.removeWhere(
+      (element) => element.chapter.title == chapter.chapter.title,
+    );
+    download.chapters.add(chapter);
+    await _downloadRepository.update(
+      data: download,
+      uniqueid: chapter.uniqueid,
+    );
   }
 }
