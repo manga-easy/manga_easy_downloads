@@ -4,9 +4,8 @@ import 'package:manga_easy_downloads/src/features/presenter/controllers/download
 import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_manga_download.dart';
 
 class ListMangaDownload extends StatelessWidget {
-  final String title;
   final DownloadController ct;
-  const ListMangaDownload({super.key, required this.title, required this.ct});
+  const ListMangaDownload({super.key, required this.ct});
 
   @override
   Widget build(BuildContext context) {
@@ -15,10 +14,11 @@ class ListMangaDownload extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 10),
-          CoffeeText(
-            text: title,
+          const CoffeeText(
+            text: 'Baixados',
             typography: CoffeeTypography.title,
           ),
+          const SizedBox(height: 10),
           ListView.builder(
             itemCount: ct.listDone.length,
             shrinkWrap: true,

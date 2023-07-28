@@ -142,7 +142,7 @@ class _DownloadPageState extends State<DownloadPage> {
                 },
               ),
             ),
-            ListMangaDownload(title: 'Baixados', ct: ct),
+            ListMangaDownload(ct: ct),
           ],
         ),
       ),
