@@ -16,10 +16,10 @@ class ChapterDownloadController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteAllChapter({required DownloadEntity downloadEntity}) async {
-    await repository.delete(uniqueid: downloadEntity.uniqueid);
-    final file = Directory(
-        '${downloadEntity.folder}/manga-easy/${downloadEntity.uniqueid}');
+  void deleteAllChapter(
+      {required String uniqueid, required String folder}) async {
+    await repository.delete(uniqueid: uniqueid);
+    final file = Directory('$folder/manga-easy/$uniqueid}');
     if (await file.exists()) {
       file.deleteSync(recursive: true);
       print('Pasta excluída com sucesso');
@@ -30,5 +30,25 @@ class ChapterDownloadController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteOneChapter() async {}
+  void deleteOneChapter(
+      {required DownloadEntity mangaDownload,
+      required ChapterStatusEntity removeChapter}) async {
+    if (mangaDownload.chapters.length == 1) {
+      deleteAllChapter(
+          uniqueid: mangaDownload.uniqueid, folder: mangaDownload.folder);
+    } else {
+      mangaDownload.chapters.removeWhere((e) => e == removeChapter);
+      repository.update(data: mangaDownload, uniqueid: mangaDownload.uniqueid);
+    }
+    final file = Directory(
+        '${mangaDownload.folder}/manga-easy/${mangaDownload.uniqueid}/${removeChapter.chapter.number}');
+    if (await file.exists()) {
+      file.deleteSync(recursive: true);
+      print('Pasta excluída com sucesso');
+    } else {
+      print('A pasta não existe');
+    }
+    //TODO listDownload();
+    notifyListeners();
+  }
 }
