@@ -67,7 +67,7 @@ class ContainerMangaDownload extends StatelessWidget {
                         ),
                         CoffeeText(
                           text: ct.calculateFolderSize(
-                              '${mangaDownload.folder}/Manga Easy/${mangaDownload.uniqueid}'),
+                              '${mangaDownload.folder}/manga-easy/${mangaDownload.uniqueid}'),
                           color:
                               ThemeService.of.backgroundText.withOpacity(0.5),
                         ),
