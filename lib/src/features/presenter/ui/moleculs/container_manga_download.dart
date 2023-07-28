@@ -29,6 +29,7 @@ class ContainerMangaDownload extends StatelessWidget {
         arguments: mangaDownload,
       ),
       child: CoffeeContainer(
+        margin: const EdgeInsets.only(bottom: 10),
         child: SizedBox(
           height: 200,
           child: Row(
