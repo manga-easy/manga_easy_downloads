@@ -31,6 +31,7 @@ class DownloadMicroApp extends MicroApp {
     //Service
     getIt.registerLazySingleton(() => ServiceDownload(
           getIt(),
+          getIt()
         ));
 
     //Controller
