@@ -11,9 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
   manga_easy_sdk:
-    git:
-      url: https://github.com/manga-easy/manga_easy_sdk.git
-      ref: v1.3.0
+    path: ../manga_easy_sdk
+
   coffee_cup:
     path: ../manga_easy_coffee_cup
   hosts:
@@ -45,9 +44,7 @@ dependencies:
   permission_handler: ^10.3.0
 dependency_overrides: 
   manga_easy_sdk:
-    git:
-      url: https://github.com/manga-easy/manga_easy_sdk.git
-      ref: v1.4.0
+    path: ../manga_easy_sdk
 dev_dependencies:
   flutter_test:
     sdk: flutter
