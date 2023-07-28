@@ -31,7 +31,7 @@ class ListMangaDownload extends StatelessWidget {
                 isPaused: ct.isPaused,
               );
             },
-          )
+          ),
         ],
       ),
     );

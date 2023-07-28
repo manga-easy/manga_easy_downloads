@@ -59,7 +59,6 @@ class _DownloadPageState extends State<DownloadPage> {
           setState(() {
             ct.savePauseAllPref();
           });
-          ct.downloadFile();
         },
         child: ct.isPausedAll
             ? const Icon(

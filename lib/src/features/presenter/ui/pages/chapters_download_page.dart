@@ -41,7 +41,9 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
             PopupMenuItem(
               onTap: () {
                 setState(() {
-                  ct.deleteAllChapter(downloadEntity: ct.mangaDownload!);
+                  ct.deleteAllChapter(
+                      uniqueid: ct.mangaDownload!.uniqueid,
+                      folder: ct.mangaDownload!.folder);
                 });
               },
               child: const CoffeeText(text: 'Limpar todos os downloads'),

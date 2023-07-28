@@ -5,7 +5,6 @@ import 'package:get_it/get_it.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_downloads/src/features/domain/repositories/download_repository.dart';
 import 'package:manga_easy_downloads/src/features/domain/services/service_download.dart';
-import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 import 'package:persistent_database/persistent_database.dart';
 
 class DownloadController extends ChangeNotifier {
@@ -72,45 +71,6 @@ class DownloadController extends ChangeNotifier {
 
   double downloadProgress = 0.0;
 
-  void downloadFile() async {
-    try {
-      listDownload();
-
-      print(listTodo.map((e) => e.chapters).map((e) => e.map((e) => e.status)));
-
-      print('listTodo $listTodo');
-      print('list done ${listDone.map((e) => e.manga.title).toList()}');
-      var listBanco = await repository.list();
-      print(
-          'list do banco $listBanco, ${listBanco[0].chapters}, ${listBanco[1].chapters}');
-
-      notifyListeners();
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  void downloadManga(DownloadEntity downloadEntity) {
-    // Conferir se o manga ja tem algum existente criado pra adicionar na lista de chapter
-
-    if (listMangaDownloadTemp
-        .any((e) => e.uniqueid == downloadEntity.uniqueid)) {
-      for (var chapter in downloadEntity.chapters) {
-        // sera que vai ter um mesmo manga adicionado ? tipo no caso eu baixei 3 mangas e depois clico em baixar todos mangas
-
-        listMangaDownloadTemp
-            .firstWhere((e) => e.uniqueid == downloadEntity.uniqueid)
-            .chapters
-            .add(chapter);
-        //botar em um update isso ai pra atualizar tambem no canco local
-      }
-      //     update
-      // download.chapters.add
-    } else {
-      listMangaDownloadTemp.add(downloadEntity);
-    }
-  }
-
   String calculateFolderSize(String dirPath) {
     var dir = Directory(dirPath);
     int totalSize = 0;
@@ -142,24 +102,12 @@ class DownloadController extends ChangeNotifier {
 
   void deleteAllDownload() async {
     await repository.deleteAll();
-    for (var downloadTransfer in listTodo) {
+    for (var downloadTransfer in listMangaDownloadTemp) {
       final folder = Directory(
           '${downloadTransfer.folder}/manga-easy/${downloadTransfer.uniqueid}');
 
       if (await folder.exists()) {
         folder.deleteSync(recursive: true);
-      } else {
-        print('A pasta não existe');
-      }
-    }
-
-    for (var download in listDone) {
-      final folder =
-          Directory('${download.folder}/manga-easy/${download.uniqueid}');
-      await repository.delete(uniqueid: download.uniqueid);
-      if (await folder.exists()) {
-        folder.deleteSync(recursive: true);
-        print('Pasta excluída com sucesso');
       } else {
         print('A pasta não existe');
       }
