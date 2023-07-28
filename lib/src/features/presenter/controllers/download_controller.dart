@@ -3,35 +3,20 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
+import 'package:manga_easy_downloads/src/features/domain/repositories/download_repository.dart';
 import 'package:manga_easy_downloads/src/features/domain/services/service_download.dart';
-import 'package:manga_easy_downloads/src/features/domain/usecases/create_usecase.dart';
-import 'package:manga_easy_downloads/src/features/domain/usecases/delete_all_usecase.dart';
-import 'package:manga_easy_downloads/src/features/domain/usecases/delete_usecase.dart';
-import 'package:manga_easy_downloads/src/features/domain/usecases/get_usecase.dart';
-import 'package:manga_easy_downloads/src/features/domain/usecases/list_usecase.dart';
-import 'package:manga_easy_downloads/src/features/domain/usecases/update_usecase.dart';
 import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 import 'package:persistent_database/persistent_database.dart';
 
 class DownloadController extends ChangeNotifier {
-  final CreateUsecase createCase;
-  final UpdateUsecase updateCase;
-  final DeleteUsecase deleteCase;
-  final DeleteAllUsecase deleteAllCase;
-  final GetUsecase getCase;
-  final ListUsecase listCase;
+  final DownloadRepository repository;
   final ServiceDownload _service;
   final Preference _servicePrefs;
 
   DownloadController(
-    this.createCase,
-    this.updateCase,
-    this.deleteCase,
-    this.deleteAllCase,
-    this.getCase,
-    this.listCase,
     this._service,
     this._servicePrefs,
+    this.repository,
   );
 
   bool isPausedAll = false;
@@ -61,7 +46,7 @@ class DownloadController extends ChangeNotifier {
   List<DownloadEntity> listMangaDownloadTemp = [];
 
   void listDownload() async {
-    listMangaDownloadTemp = await listCase.list();
+    listMangaDownloadTemp = await repository.list();
     print('listMangaDownloadTemp $listMangaDownloadTemp');
     print('Lista toda $listMangaDownloadTemp');
     listTodo =
@@ -95,7 +80,7 @@ class DownloadController extends ChangeNotifier {
 
       print('listTodo $listTodo');
       print('list done ${listDone.map((e) => e.manga.title).toList()}');
-      var listBanco = await listCase.list();
+      var listBanco = await repository.list();
       print(
           'list do banco $listBanco, ${listBanco[0].chapters}, ${listBanco[1].chapters}');
 
@@ -156,10 +141,10 @@ class DownloadController extends ChangeNotifier {
   }
 
   void deleteAllDownload() async {
-    await deleteAllCase.deleteAll();
+    await repository.deleteAll();
     for (var downloadTransfer in listTodo) {
       final folder = Directory(
-          '${downloadTransfer.folder}/Manga Easy/${downloadTransfer.uniqueid}');
+          '${downloadTransfer.folder}/manga-easy/${downloadTransfer.uniqueid}');
 
       if (await folder.exists()) {
         folder.deleteSync(recursive: true);
@@ -170,8 +155,8 @@ class DownloadController extends ChangeNotifier {
 
     for (var download in listDone) {
       final folder =
-          Directory('${download.folder}/Manga Easy/${download.uniqueid}');
-      await deleteCase.delete(id: download.id!);
+          Directory('${download.folder}/manga-easy/${download.uniqueid}');
+      await repository.delete(uniqueid: download.uniqueid);
       if (await folder.exists()) {
         folder.deleteSync(recursive: true);
         print('Pasta excluída com sucesso');

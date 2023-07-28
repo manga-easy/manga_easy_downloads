@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
-import 'package:manga_easy_downloads/src/features/domain/usecases/delete_usecase.dart';
+import 'package:manga_easy_downloads/src/features/domain/repositories/download_repository.dart';
 
 class ChapterDownloadController extends ChangeNotifier {
-  final DeleteUsecase deleteCase;
+  final DownloadRepository repository;
 
-  ChapterDownloadController(this.deleteCase);
+  ChapterDownloadController(this.repository);
 
   DownloadEntity? mangaDownload;
 
@@ -17,9 +17,9 @@ class ChapterDownloadController extends ChangeNotifier {
   }
 
   void deleteAllChapter({required DownloadEntity downloadEntity}) async {
-    await deleteCase.delete(id: downloadEntity.id!);
+    await repository.delete(uniqueid: downloadEntity.uniqueid);
     final file = Directory(
-        '${downloadEntity.folder}/Manga Easy/${downloadEntity.uniqueid}');
+        '${downloadEntity.folder}/manga-easy/${downloadEntity.uniqueid}');
     if (await file.exists()) {
       file.deleteSync(recursive: true);
       print('Pasta excluída com sucesso');
