@@ -55,6 +55,7 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
         child: BottomAppBar(
           color: Colors.transparent,
           elevation: 0,
+          padding: const EdgeInsets.only(bottom: 10, left: 16, right: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
