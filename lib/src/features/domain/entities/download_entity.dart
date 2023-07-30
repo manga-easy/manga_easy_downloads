@@ -59,4 +59,16 @@ class ChapterStatusEntity {
   Status status;
 
   ChapterStatusEntity(this.chapter, this.status, this.uniqueid);
+
+  ChapterStatusEntity copyWith({
+    String? uniqueid,
+    Chapter? chapter,
+    Status? status,
+  }) {
+    return ChapterStatusEntity(
+      chapter ?? this.chapter.copyWith(),
+      status ?? this.status,
+      uniqueid ?? this.uniqueid,
+    );
+  }
 }

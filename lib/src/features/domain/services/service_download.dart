@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:dio/dio.dart';
+import 'package:client_driver/client_driver.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
@@ -14,10 +14,12 @@ import 'package:permission_handler/permission_handler.dart' as handler;
 class ServiceDownload extends ChangeNotifier {
   final Preference _preference;
   final DownloadRepository _downloadRepository;
+  final ClientRequest _clientRequest;
 
   ServiceDownload(
     this._preference,
     this._downloadRepository,
+    this._clientRequest,
   );
 
   final _downloadQueue = <ChapterStatusEntity>[];
@@ -53,8 +55,10 @@ class ServiceDownload extends ChangeNotifier {
 
   // Adiciona um URL à fila de downloads
   void enqueueDownload(Chapter chapter, String uniqueid) {
-    _downloadQueue.add(ChapterStatusEntity(chapter, Status.doing, uniqueid));
-    _downloadNext();
+    if (!isChapterInQueue(chapter, uniqueid)) {
+      _downloadQueue.add(ChapterStatusEntity(chapter, Status.doing, uniqueid));
+      _downloadNext();
+    }
     notifyListeners();
   }
 
@@ -70,17 +74,13 @@ class ServiceDownload extends ChangeNotifier {
   // Realiza o download do próximo item na fila
   void _downloadNext() {
     if (isDownloading || _downloadQueue.isEmpty) return;
-
-    final chapter = _downloadQueue.first;
-    _downloadChapter(chapter).then((_) {
+    isDownloading = true;
+    _downloadChapter(_downloadQueue.first).then((_) {
       isDownloading = false;
       _downloadNext();
     });
-    isDownloading = true;
     notifyListeners();
   }
-
-  CancelToken cancelToken = CancelToken();
 
   double getDownloadProgress(int totalImages, int completedImages) {
     return totalImages > 0 ? completedImages / totalImages : 0.0;
@@ -88,17 +88,17 @@ class ServiceDownload extends ChangeNotifier {
 
   void progress(int totalImages, int completedImages) {
     downloadProgress = getDownloadProgress(totalImages, completedImages);
-    Helps.log('Progress idication $downloadProgress');
     notifyListeners();
   }
 
-  Future<void> _downloadChapter(ChapterStatusEntity chapter) async {
+  Future<void> _downloadChapter(ChapterStatusEntity chapterStatus) async {
+    List<ImageChapter> auxImage = [];
     try {
-      _currentChapter = chapter;
+      _currentChapter = chapterStatus;
       path ??= await FilePicker.platform.getDirectoryPath();
 
       var directory = Directory(
-        '$path/manga-easy/${chapter.uniqueid}/${chapter.chapter.number}',
+        '$path/manga-easy/${chapterStatus.uniqueid}/${chapterStatus.chapter.number}',
       );
 
       if (!directory.existsSync()) {
@@ -111,8 +111,10 @@ class ServiceDownload extends ChangeNotifier {
         host: HostModel.empty()..host = 'http://api.lucas-cm.com.br',
         headers: Global.header,
       );
-      final images = await host.getConteudoChapter(manga: chapter.chapter.href);
+      final images =
+          await host.getConteudoChapter(manga: chapterStatus.chapter.href);
       var totalDone = 0;
+      print('befor - ${auxImage.length}');
       for (var image in images) {
         try {
           progress(images.length, totalDone);
@@ -120,55 +122,54 @@ class ServiceDownload extends ChangeNotifier {
           final file = File('${directory.path}/${image.src.split('/').last}');
           image.path = file.path;
           if (file.existsSync()) {
+            auxImage.add(image);
+            print('after - ${auxImage.length}');
             continue;
           }
 
-          final response = await Dio().get(
-            image.src,
-            options: Options(
-              headers: Global.header,
-              responseType: ResponseType.bytes,
-            ),
-            cancelToken: cancelToken,
+          final response = await _clientRequest.get(
+            path: image.src,
+            headers: Global.header,
           );
 
-          final fileBytes = response.data;
+          final fileBytes = response.data['data'];
           var compressImage = await FlutterImageCompress.compressWithList(
             fileBytes,
             quality: 20,
           );
           //quando quebrar o bovinão arruma
           await file.writeAsBytes(compressImage, mode: FileMode.write);
-          chapter.chapter.imagens.add(image);
+          auxImage.add(image);
+          print('after - ${auxImage.length}');
         } catch (e) {
           print('Deu erro no download: $e');
         }
       }
-      chapter.status = Status.done;
+      chapterStatus.status = Status.done;
     } catch (e) {
-      chapter.status = Status.error;
+      chapterStatus.status = Status.error;
       Helps.log(e);
     }
+    final chapter = chapterStatus.chapter.copyWith(imagens: auxImage);
     _currentChapter = null;
     isDownloading = false;
-    await saveChapter(chapter);
-    _downloadQueue.remove(chapter);
-    notifyListeners();
+    await saveChapter(chapter, chapterStatus.uniqueid);
+    removeChapter(chapter, chapterStatus.uniqueid);
   }
 
   void pauseDownload() {
-    cancelToken.cancel();
+    //cancelToken.cancel();
   }
 
-  Future<void> saveChapter(ChapterStatusEntity chapter) async {
-    final download = await _downloadRepository.get(uniqueid: chapter.uniqueid);
+  Future<void> saveChapter(Chapter chapter, String uniqueid) async {
+    final download = await _downloadRepository.get(uniqueid: uniqueid);
     download!.chapters.removeWhere(
-      (element) => element.chapter.title == chapter.chapter.title,
+      (element) => element.chapter.title == chapter.title,
     );
-    download.chapters.add(chapter);
+    download.chapters.add(ChapterStatusEntity(chapter, Status.done, uniqueid));
     await _downloadRepository.update(
       data: download,
-      uniqueid: chapter.uniqueid,
+      uniqueid: uniqueid,
     );
   }
 }
