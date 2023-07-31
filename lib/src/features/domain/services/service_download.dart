@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:client_driver/client_driver.dart';
 import 'package:file_picker/file_picker.dart';
@@ -95,7 +96,16 @@ class ServiceDownload extends ChangeNotifier {
     List<ImageChapter> auxImage = [];
     try {
       _currentChapter = chapterStatus;
-      path ??= await FilePicker.platform.getDirectoryPath();
+      path = await _preference.get(
+        keyPreferences: KeyPreferences.downloadFolder,
+      );
+      if (path == null) {
+        path = await FilePicker.platform.getDirectoryPath();
+        await _preference.put(
+          keyPreferences: KeyPreferences.downloadFolder,
+          value: path,
+        );
+      }
 
       var directory = Directory(
         '$path/manga-easy/${chapterStatus.uniqueid}/${chapterStatus.chapter.number}',
@@ -127,22 +137,21 @@ class ServiceDownload extends ChangeNotifier {
             continue;
           }
 
-          final response = await _clientRequest.get(
+          final response = await ClientDio().get(
             path: image.src,
             headers: Global.header,
           );
 
-          final fileBytes = response.data['data'];
-          var compressImage = await FlutterImageCompress.compressWithList(
-            fileBytes,
-            quality: 20,
-          );
+          // var compressImage = await FlutterImageCompress.compressWithList(
+          //   response.bodyBytes!,
+          //   quality: 20,
+          // );
           //quando quebrar o bovinão arruma
-          await file.writeAsBytes(compressImage, mode: FileMode.write);
+          await file.writeAsBytes(response.bodyBytes!, mode: FileMode.write);
           auxImage.add(image);
           print('after - ${auxImage.length}');
         } catch (e) {
-          print('Deu erro no download: $e');
+          Helps.log(e);
         }
       }
       chapterStatus.status = Status.done;
@@ -171,5 +180,34 @@ class ServiceDownload extends ChangeNotifier {
       data: download,
       uniqueid: uniqueid,
     );
+  }
+
+  Future<void> deleteChapter(Chapter chapter, String uniqueid) async {
+    path = await _preference.get(
+      keyPreferences: KeyPreferences.downloadFolder,
+    );
+    final dir = Directory(
+      '$path/manga-easy/$uniqueid/${chapter.number}',
+    );
+    await dir.delete(recursive: true);
+    final result = await _downloadRepository.get(
+      uniqueid: uniqueid,
+    );
+    if (result != null) {
+      //remove o capitulo dos downloads
+      result.chapters.removeWhere(
+        (element) => element.chapter.title == chapter.title,
+      );
+      //se não tiver mais capitulos depois que removeu limpa o download entity tbm
+      if (result.chapters.isEmpty) {
+        await _downloadRepository.delete(uniqueid: result.uniqueid);
+      } else {
+        await _downloadRepository.update(
+          data: result,
+          uniqueid: result.uniqueid,
+        );
+      }
+    }
+    notifyListeners();
   }
 }
