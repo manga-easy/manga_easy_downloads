@@ -10,6 +10,13 @@ class ChapterDownloadController extends ChangeNotifier {
 
   DownloadEntity? mangaDownload;
 
+  List<ChapterStatus> listMangaDownload = [];
+  List<ChapterStatus> listFilterDownload = [];
+  List<ChapterStatus> listMangaTodo = [];
+  List<ChapterStatus> listFilterTodo = [];
+
+  TextEditingController searchChapterController = TextEditingController();
+
   init(BuildContext context) {
     final arguments = ModalRoute.of(context)!.settings.arguments;
     mangaDownload = arguments as DownloadEntity;
@@ -20,6 +27,7 @@ class ChapterDownloadController extends ChangeNotifier {
       {required String uniqueid, required String folder}) async {
     await repository.delete(uniqueid: uniqueid);
     final file = Directory('$folder/manga-easy/$uniqueid}');
+
     if (await file.exists()) {
       file.deleteSync(recursive: true);
       print('Pasta excluída com sucesso');
@@ -51,4 +59,5 @@ class ChapterDownloadController extends ChangeNotifier {
     //TODO listDownload();
     notifyListeners();
   }
+  
 }

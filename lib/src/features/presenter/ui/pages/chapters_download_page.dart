@@ -19,14 +19,47 @@ class ChapterDownloadPage extends StatefulWidget {
 
 class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
   ChapterDownloadController ct = GetIt.I();
+  TextEditingController searchChapterController = TextEditingController();
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) => ct.init(context));
+
     ct.addListener(() {
-      setState(() {});
+      setState(() {
+        ct.listMangaDownload = ct.mangaDownload!.chapters
+            .where((element) => element.status == Status.done)
+            .toList()
+          ..sort((a, b) =>
+              int.parse(a.chapter.title).compareTo(int.parse(b.chapter.title)));
+        ct.listMangaTodo = ct.mangaDownload!.chapters
+            .where((element) => element.status == Status.todo)
+            .toList();
+      });
+      ct.listFilterDownload = List.from(ct.listMangaDownload);
+      ct.listFilterTodo = List.from(ct.listMangaTodo);
     });
     super.initState();
+  }
+
+  void filterList(String filter) {
+    setState(() {
+      var newFilter = filter;
+      if (filter.length >= 2 && filter[0] == '0') {
+        newFilter = filter.substring(1);
+      }
+      if (newFilter.isNotEmpty) {
+        ct.listFilterDownload = ct.listMangaDownload
+            .where((item) => item.chapter.title.contains(newFilter))
+            .toList();
+        ct.listFilterTodo = ct.listMangaDownload
+            .where((item) => item.chapter.title.contains(newFilter))
+            .toList();
+      } else {
+        ct.listFilterDownload = List.from(ct.listMangaDownload);
+        ct.listFilterTodo = List.from(ct.listMangaTodo);
+      }
+    });
   }
 
   @override
@@ -37,6 +70,9 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
         preferredSize: const Size(double.infinity, 50),
         child: CustomAppBar(
           title: ct.mangaDownload!.manga.title,
+          controller: searchChapterController,
+          keyboardType: TextInputType.number,
+          onChanged: filterList,
           listPopMenu: [
             PopupMenuItem(
               onTap: () {
@@ -123,10 +159,7 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                     typography: CoffeeTypography.title,
                   ),
                   ListChapterDownload(
-                    listChapter: ct.mangaDownload!.chapters
-                        .where((element) => element.status == Status.done)
-                        .toList()..sort((a, b) => int.parse(a.chapter.title)
-                            .compareTo(int.parse(b.chapter.title))),
+                    listChapter: ct.listFilterDownload,
                     icons: [
                       CoffeeIconButton(
                         onTap: () {},

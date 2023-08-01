@@ -4,11 +4,18 @@ import 'package:manga_easy_themes/manga_easy_themes.dart';
 
 class CustomAppBar extends StatefulWidget {
   final String title;
-
   final List<PopupMenuEntry<dynamic>> listPopMenu;
+  final TextEditingController controller;
+  final void Function(String)? onChanged;
+  final TextInputType? keyboardType;
 
   const CustomAppBar(
-      {super.key, required this.title, required this.listPopMenu});
+      {super.key,
+      required this.title,
+      required this.listPopMenu,
+      required this.controller,
+      required this.onChanged,
+      this.keyboardType});
 
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
@@ -29,6 +36,9 @@ class _CustomAppBarState extends State<CustomAppBar> {
       ),
       title: isSearch
           ? CoffeeSearchField(
+              controller: widget.controller,
+              onChanged: widget.onChanged,
+              keyboardType: widget.keyboardType,
               suffixIcon: CoffeeIconButton(
                 icon: Icons.close,
                 onTap: () {
