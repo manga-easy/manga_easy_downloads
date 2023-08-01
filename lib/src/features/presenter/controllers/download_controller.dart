@@ -20,10 +20,17 @@ class DownloadController extends ChangeNotifier {
 
   bool isPausedAll = false;
   bool isPaused = false;
+  List<DownloadEntity> listTodo = [];
+  List<DownloadEntity> listDone = [];
+  List<DownloadEntity> listMangaDownloadTemp = [];
+  List<DownloadEntity> listFilterDownload = [];
+  List<DownloadEntity> listFilterTodo = [];
 
   void init() async {
     listDownload();
     isPausedAll = await readPauseAllPref();
+    listFilterDownload = List.from(listDone);
+    listFilterTodo = List.from(listTodo);
     notifyListeners();
   }
 
@@ -40,9 +47,22 @@ class DownloadController extends ChangeNotifier {
         keyPreferences: KeyPreferences.downloadPauseAll);
   }
 
-  List<DownloadEntity> listTodo = [];
-  List<DownloadEntity> listDone = [];
-  List<DownloadEntity> listMangaDownloadTemp = [];
+  void filterList(String filter) {
+    if (filter.isNotEmpty) {
+      listFilterDownload = listDone
+          .where((item) =>
+              item.manga.title.toLowerCase().contains(filter.toLowerCase()))
+          .toList();
+      listFilterTodo = listTodo
+          .where((item) =>
+              item.manga.title.toLowerCase().contains(filter.toLowerCase()))
+          .toList();
+    } else {
+      listFilterDownload = List.from(listDone);
+      listFilterTodo = List.from(listTodo);
+    }
+    notifyListeners();
+  }
 
   void listDownload() async {
     listMangaDownloadTemp = await repository.list();

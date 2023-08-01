@@ -4,7 +4,6 @@ import 'package:get_it/get_it.dart';
 import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_manga_download.dart';
-import 'package:manga_easy_downloads/src/features/presenter/ui/organisms/list_manga_download.dart';
 import 'package:manga_easy_themes/manga_easy_themes.dart';
 import 'package:reorderables/reorderables.dart';
 
@@ -18,6 +17,7 @@ class DownloadPage extends StatefulWidget {
 
 class _DownloadPageState extends State<DownloadPage> {
   DownloadController ct = GetIt.I();
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
@@ -36,6 +36,8 @@ class _DownloadPageState extends State<DownloadPage> {
       appBar: PreferredSize(
         preferredSize: const Size(double.infinity, 50),
         child: CustomAppBar(
+          controller: searchController,
+          onChanged: ct.filterList,
           title: 'Downloads',
           listPopMenu: [
             PopupMenuItem(
@@ -80,27 +82,27 @@ class _DownloadPageState extends State<DownloadPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ct.listTodo.length > 1
+                      ct.listFilterTodo.length > 1
                           ? CoffeeText(
                               text:
-                                  '${ct.listDone.length} capítulos em transferência')
+                                  '${ct.listFilterDownload.length} capítulos em transferência')
                           : CoffeeText(
                               text:
-                                  '${ct.listTodo.length} capítulo em transferência'),
-                      ct.listDone.length > 1
+                                  '${ct.listFilterTodo.length} capítulo em transferência'),
+                      ct.listFilterDownload.length > 1
                           ? CoffeeText(
                               text:
-                                  '${ct.listDone.length} capítulos baixados no total')
+                                  '${ct.listFilterDownload.length} capítulos baixados no total')
                           : CoffeeText(
                               text:
-                                  '${ct.listDone.length} capítulo baixado no total'),
+                                  '${ct.listFilterDownload.length} capítulo baixado no total'),
                     ],
                   ),
                 ],
               ),
             ),
             SliverVisibility(
-              visible: ct.listTodo.isNotEmpty,
+              visible: ct.listFilterTodo.isNotEmpty,
               sliver: const SliverPadding(
                 padding: EdgeInsets.symmetric(vertical: 10),
                 sliver: SliverToBoxAdapter(
@@ -112,12 +114,12 @@ class _DownloadPageState extends State<DownloadPage> {
               ),
             ),
             SliverVisibility(
-              visible: ct.listTodo.isNotEmpty,
+              visible: ct.listFilterTodo.isNotEmpty,
               sliver: ReorderableSliverList(
                 delegate: ReorderableSliverChildBuilderDelegate(
-                  childCount: ct.listTodo.length,
+                  childCount: ct.listFilterTodo.length,
                   (context, idx) {
-                    var mangaDownload = ct.listTodo[idx];
+                    var mangaDownload = ct.listFilterTodo[idx];
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 5),
                       child: ContainerMangaDownload(
@@ -135,13 +137,38 @@ class _DownloadPageState extends State<DownloadPage> {
                     if (newIndex > oldIndex) {
                       newIndex -= 1;
                     }
-                    final item = ct.listTodo.removeAt(oldIndex);
-                    ct.listTodo.insert(newIndex, item);
+                    final item = ct.listFilterTodo.removeAt(oldIndex);
+                    ct.listFilterTodo.insert(newIndex, item);
                   });
                 },
               ),
             ),
-            ListMangaDownload(ct: ct),
+            SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  const CoffeeText(
+                    text: 'Baixados',
+                    typography: CoffeeTypography.title,
+                  ),
+                  const SizedBox(height: 10),
+                  ListView.builder(
+                    itemCount: ct.listFilterDownload.length,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, idx) {
+                      var mangaDownload = ct.listFilterDownload[idx];
+                      return ContainerMangaDownload(
+                        mangaDownload: mangaDownload,
+                        ct: ct,
+                        isPaused: ct.isPaused,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:manga_easy_downloads/src/features/presenter/controllers/chapter_download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
-import 'package:manga_easy_downloads/src/features/presenter/ui/organisms/list_chapter_download.dart';
+import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_chapter_download.dart';
 import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
 class ChapterDownloadPage extends StatefulWidget {
@@ -98,20 +98,27 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                       text: 'Em transferência',
                       typography: CoffeeTypography.title,
                     ),
-                    ListChapterDownload(
-                      listChapter: ct.mangaDownload!.chapters
-                          .where((element) => element.status == Status.todo)
-                          .toList(),
-                      icons: [
-                        CoffeeIconButton(
-                          onTap: () {},
-                          icon: Icons.download,
-                        ),
-                        CoffeeIconButton(
-                          onTap: () {},
-                          icon: Icons.cancel_outlined,
-                        ),
-                      ],
+                    ListView.builder(
+                      itemCount: ct.listFilterTodo.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, idx) {
+                        var chapter = ct.listFilterTodo[idx].chapter;
+                        return ContainerChapterDownload(
+                          chapters: chapter.title,
+                          pages: '${chapter.imagens.length}',
+                          icons: [
+                            CoffeeIconButton(
+                              onTap: () {},
+                              icon: Icons.download,
+                            ),
+                            CoffeeIconButton(
+                              onTap: () {},
+                              icon: Icons.cancel_outlined,
+                            ),
+                          ],
+                        );
+                      },
                     ),
                   ],
                 ),
@@ -126,15 +133,29 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                     text: 'Baixados',
                     typography: CoffeeTypography.title,
                   ),
-                  ListChapterDownload(
-                    listChapter: ct.listFilterDownload,
-                    icons: [
-                      CoffeeIconButton(
-                        onTap: () {},
-                        icon: Icons.delete_outline_sharp,
-                      ),
-                    ],
-                  ),
+                  ListView.builder(
+                    itemCount: ct.listFilterDownload.length,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemBuilder: (context, idx) {
+                      var chapter = ct.listFilterDownload[idx].chapter;
+                      return ContainerChapterDownload(
+                        chapters: chapter.title,
+                        pages: '${chapter.imagens.length}',
+                        icons: [
+                          CoffeeIconButton(
+                            onTap: () {
+                              ct.deleteOneChapter(
+                                mangaDownload: ct.mangaDownload!,
+                                removeChapter: ct.listFilterDownload[idx],
+                              );
+                            },
+                            icon: Icons.delete_outline_sharp,
+                          ),
+                        ],
+                      );
+                    },
+                  )
                 ],
               ),
             ),
