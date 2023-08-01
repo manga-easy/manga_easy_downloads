@@ -112,9 +112,8 @@ class ServiceDownload extends ChangeNotifier {
 
       if (!directory.existsSync()) {
         var status = await handler.Permission.storage.request();
-        if (status.isGranted) {
-          await directory.create(recursive: true);
-        }
+        await directory.create(recursive: true);
+      //  if (status.isGranted) {}
       }
       final host = ApiManga.getByID(
         host: HostModel.empty()..host = 'http://api.lucas-cm.com.br',
