@@ -125,7 +125,8 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                   ListChapterDownload(
                     listChapter: ct.mangaDownload!.chapters
                         .where((element) => element.status == Status.done)
-                        .toList(),
+                        .toList()..sort((a, b) => int.parse(a.chapter.title)
+                            .compareTo(int.parse(b.chapter.title))),
                     icons: [
                       CoffeeIconButton(
                         onTap: () {},
