@@ -20,6 +20,16 @@ class ChapterDownloadController extends ChangeNotifier {
   init(BuildContext context) {
     final arguments = ModalRoute.of(context)!.settings.arguments;
     mangaDownload = arguments as DownloadEntity;
+    listMangaDownload = mangaDownload!.chapters
+        .where((element) => element.status == Status.done)
+        .toList()
+      ..sort((a, b) =>
+          int.parse(a.chapter.title).compareTo(int.parse(b.chapter.title)));
+    listMangaTodo = mangaDownload!.chapters
+        .where((element) => element.status == Status.todo)
+        .toList();
+    listFilterDownload = List.from(listMangaDownload);
+    listFilterTodo = List.from(listMangaTodo);
     notifyListeners();
   }
 
@@ -59,5 +69,23 @@ class ChapterDownloadController extends ChangeNotifier {
     //TODO listDownload();
     notifyListeners();
   }
-  
+
+  void filterList(String filter) {
+    var newFilter = filter;
+    if (filter.length >= 2 && filter[0] == '0') {
+      newFilter = filter.substring(1);
+    }
+    if (newFilter.isNotEmpty) {
+      listFilterDownload = listMangaDownload
+          .where((item) => item.chapter.title.contains(newFilter))
+          .toList();
+      listFilterTodo = listMangaDownload
+          .where((item) => item.chapter.title.contains(newFilter))
+          .toList();
+    } else {
+      listFilterDownload = List.from(listMangaDownload);
+      listFilterTodo = List.from(listMangaTodo);
+    }
+    notifyListeners();
+  }
 }

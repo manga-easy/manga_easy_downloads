@@ -24,42 +24,10 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) => ct.init(context));
-
     ct.addListener(() {
-      setState(() {
-        ct.listMangaDownload = ct.mangaDownload!.chapters
-            .where((element) => element.status == Status.done)
-            .toList()
-          ..sort((a, b) =>
-              int.parse(a.chapter.title).compareTo(int.parse(b.chapter.title)));
-        ct.listMangaTodo = ct.mangaDownload!.chapters
-            .where((element) => element.status == Status.todo)
-            .toList();
-      });
-      ct.listFilterDownload = List.from(ct.listMangaDownload);
-      ct.listFilterTodo = List.from(ct.listMangaTodo);
+      setState(() {});
     });
     super.initState();
-  }
-
-  void filterList(String filter) {
-    setState(() {
-      var newFilter = filter;
-      if (filter.length >= 2 && filter[0] == '0') {
-        newFilter = filter.substring(1);
-      }
-      if (newFilter.isNotEmpty) {
-        ct.listFilterDownload = ct.listMangaDownload
-            .where((item) => item.chapter.title.contains(newFilter))
-            .toList();
-        ct.listFilterTodo = ct.listMangaDownload
-            .where((item) => item.chapter.title.contains(newFilter))
-            .toList();
-      } else {
-        ct.listFilterDownload = List.from(ct.listMangaDownload);
-        ct.listFilterTodo = List.from(ct.listMangaTodo);
-      }
-    });
   }
 
   @override
@@ -72,7 +40,7 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
           title: ct.mangaDownload!.manga.title,
           controller: searchChapterController,
           keyboardType: TextInputType.number,
-          onChanged: filterList,
+          onChanged: ct.filterList,
           listPopMenu: [
             PopupMenuItem(
               onTap: () {
