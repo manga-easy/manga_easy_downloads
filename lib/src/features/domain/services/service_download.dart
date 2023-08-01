@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'package:client_driver/client_driver.dart';
+import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:hosts/hosts.dart';
-import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_downloads/src/features/domain/repositories/download_repository.dart';
 import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 import 'package:persistent_database/persistent_database.dart';
@@ -23,12 +22,12 @@ class ServiceDownload extends ChangeNotifier {
     this._clientRequest,
   );
 
-  final _downloadQueue = <ChapterStatusEntity>[];
+  final _downloadQueue = <ChapterStatus>[];
   bool isDownloading = false;
   double downloadProgress = 0.0;
   String? path;
 
-  ChapterStatusEntity? _currentChapter;
+  ChapterStatus? _currentChapter;
 
   bool isCurrentChapter(Chapter chapter, String uniqueid) {
     final current = _currentChapter;
@@ -57,7 +56,7 @@ class ServiceDownload extends ChangeNotifier {
   // Adiciona um URL à fila de downloads
   void enqueueDownload(Chapter chapter, String uniqueid) {
     if (!isChapterInQueue(chapter, uniqueid)) {
-      _downloadQueue.add(ChapterStatusEntity(chapter, Status.doing, uniqueid));
+      _downloadQueue.add(ChapterStatus(chapter, Status.doing, uniqueid));
       _downloadNext();
     }
     notifyListeners();
@@ -92,7 +91,7 @@ class ServiceDownload extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _downloadChapter(ChapterStatusEntity chapterStatus) async {
+  Future<void> _downloadChapter(ChapterStatus chapterStatus) async {
     List<ImageChapter> auxImage = [];
     try {
       _currentChapter = chapterStatus;
@@ -121,10 +120,10 @@ class ServiceDownload extends ChangeNotifier {
         host: HostModel.empty()..host = 'http://api.lucas-cm.com.br',
         headers: Global.header,
       );
-      final images =
-          await host.getConteudoChapter(manga: chapterStatus.chapter.href);
+      final images = await host.getConteudoChapter(
+        manga: chapterStatus.chapter.href,
+      );
       var totalDone = 0;
-      print('befor - ${auxImage.length}');
       for (var image in images) {
         try {
           progress(images.length, totalDone);
@@ -133,23 +132,24 @@ class ServiceDownload extends ChangeNotifier {
           image.path = file.path;
           if (file.existsSync()) {
             auxImage.add(image);
-            print('after - ${auxImage.length}');
             continue;
           }
 
-          final response = await ClientDio().get(
-            path: image.src,
-            headers: Global.header,
+          final response = await Dio().get(
+            image.src,
+            options: Options(
+              headers: Global.header,
+              responseType: ResponseType.bytes,
+            ),
           );
 
-          // var compressImage = await FlutterImageCompress.compressWithList(
-          //   response.bodyBytes!,
-          //   quality: 20,
-          // );
+          var compressImage = await FlutterImageCompress.compressWithList(
+            response.data,
+            quality: 20,
+          );
           //quando quebrar o bovinão arruma
-          await file.writeAsBytes(response.bodyBytes!, mode: FileMode.write);
+          await file.writeAsBytes(compressImage, mode: FileMode.write);
           auxImage.add(image);
-          print('after - ${auxImage.length}');
         } catch (e) {
           Helps.log(e);
         }
@@ -175,7 +175,7 @@ class ServiceDownload extends ChangeNotifier {
     download!.chapters.removeWhere(
       (element) => element.chapter.title == chapter.title,
     );
-    download.chapters.add(ChapterStatusEntity(chapter, Status.done, uniqueid));
+    download.chapters.add(ChapterStatus(chapter, Status.done, uniqueid));
     await _downloadRepository.update(
       data: download,
       uniqueid: uniqueid,
@@ -186,10 +186,14 @@ class ServiceDownload extends ChangeNotifier {
     path = await _preference.get(
       keyPreferences: KeyPreferences.downloadFolder,
     );
-    final dir = Directory(
-      '$path/manga-easy/$uniqueid/${chapter.number}',
-    );
-    await dir.delete(recursive: true);
+    try {
+      final dir = Directory(
+        '$path/manga-easy/$uniqueid/${chapter.number}',
+      );
+      await dir.delete(recursive: true);
+    } on Exception catch (e) {
+      Helps.log(e);
+    }
     final result = await _downloadRepository.get(
       uniqueid: uniqueid,
     );

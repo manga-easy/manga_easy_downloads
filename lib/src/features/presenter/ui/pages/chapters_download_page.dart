@@ -1,10 +1,10 @@
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
-import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_downloads/src/features/presenter/controllers/chapter_download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/organisms/list_chapter_download.dart';
+import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
 class ChapterDownloadPage extends StatefulWidget {
   static const route = '/chapters-download';

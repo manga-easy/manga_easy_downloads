@@ -41,6 +41,7 @@ dependencies:
   file_picker: ^5.3.2
   flutter_image_compress: ^2.0.3
   permission_handler: ^10.3.0
+  dio: ^5.3.0
 dependency_overrides: 
   manga_easy_sdk:
     path: ../manga_easy_sdk

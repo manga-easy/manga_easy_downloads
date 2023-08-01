@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_downloads/src/features/domain/repositories/download_repository.dart';
+import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
 class ChapterDownloadController extends ChangeNotifier {
   final DownloadRepository repository;
@@ -32,7 +32,7 @@ class ChapterDownloadController extends ChangeNotifier {
 
   void deleteOneChapter(
       {required DownloadEntity mangaDownload,
-      required ChapterStatusEntity removeChapter}) async {
+      required ChapterStatus removeChapter}) async {
     if (mangaDownload.chapters.length == 1) {
       deleteAllChapter(
           uniqueid: mangaDownload.uniqueid, folder: mangaDownload.folder);

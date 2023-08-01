@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_chapter_download.dart';
+import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
 class ListChapterDownload extends StatelessWidget {
-  final List<ChapterStatusEntity> listChapter;
+  final List<ChapterStatus> listChapter;
   final List<Widget> icons;
   const ListChapterDownload(
       {super.key, required this.icons, required this.listChapter});

@@ -1,4 +1,3 @@
-import 'package:manga_easy_downloads/src/features/domain/entities/download_entity.dart';
 import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
 class DownloadMapper {
@@ -12,7 +11,7 @@ class DownloadMapper {
       manga: Manga.fromJson(json['manga']),
       chapters: (json['chapters'] as List)
           .map(
-            (e) => ChapterStatusEntity(
+            (e) => ChapterStatus(
               Chapter.fromJson(e['chapter']),
               Status.values.firstWhere(
                   (s) => s.toString().split('.').last == e['status']),
