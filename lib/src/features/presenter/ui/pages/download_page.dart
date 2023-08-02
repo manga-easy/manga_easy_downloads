@@ -17,13 +17,14 @@ class DownloadPage extends StatefulWidget {
 
 class _DownloadPageState extends State<DownloadPage> {
   DownloadController ct = GetIt.I();
-  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     ct.init();
     ct.addListener(() {
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
     super.initState();
   }
@@ -36,7 +37,8 @@ class _DownloadPageState extends State<DownloadPage> {
       appBar: PreferredSize(
         preferredSize: const Size(double.infinity, 50),
         child: CustomAppBar(
-          controller: searchController,
+          textController: ct.searchController,
+          cleanSearch: ct.cleanFilter,
           onChanged: ct.filterList,
           title: 'Downloads',
           listPopMenu: [

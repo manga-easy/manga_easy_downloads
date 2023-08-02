@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:manga_easy_downloads/src/features/domain/repositories/download_repository.dart';
 import 'package:manga_easy_downloads/src/features/domain/services/service_download.dart';
@@ -25,13 +25,21 @@ class DownloadController extends ChangeNotifier {
   List<DownloadEntity> listMangaDownloadTemp = [];
   List<DownloadEntity> listFilterDownload = [];
   List<DownloadEntity> listFilterTodo = [];
+  TextEditingController searchController = TextEditingController();
 
   void init() async {
     listDownload();
     isPausedAll = await readPauseAllPref();
     listFilterDownload = List.from(listDone);
     listFilterTodo = List.from(listTodo);
+    _service.addListener(listDownload);
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _service.removeListener(listDownload);
+    super.dispose();
   }
 
   void savePauseAllPref() async {
@@ -61,19 +69,27 @@ class DownloadController extends ChangeNotifier {
       listFilterDownload = List.from(listDone);
       listFilterTodo = List.from(listTodo);
     }
+    print('aaaaaaaaaaaaaaaaaaa');
+    notifyListeners();
+  }
+
+  void cleanFilter() {
+    listFilterDownload = List.from(listDone);
+    listFilterTodo = List.from(listTodo);
+    searchController.clear();
     notifyListeners();
   }
 
   void listDownload() async {
+    print('BBBBBBBBBBBBBBBBBBBBB');
     listMangaDownloadTemp = await repository.list();
-    print('listMangaDownloadTemp $listMangaDownloadTemp');
-    print('Lista toda $listMangaDownloadTemp');
+
     listTodo =
         listMangaDownloadTemp.where((e) => e.status == Status.todo).toList();
-    print('listTodo: $listTodo');
+
     listDone =
         listMangaDownloadTemp.where((e) => e.status == Status.done).toList();
-    print('listDone: $listDone');
+
     notifyListeners();
   }
 
@@ -122,9 +138,9 @@ class DownloadController extends ChangeNotifier {
 
   void deleteAllDownload() async {
     await repository.deleteAll();
+    listDownload();
     for (var downloadTransfer in listMangaDownloadTemp) {
-      final folder = Directory(
-          '${downloadTransfer.folder}/manga-easy/${downloadTransfer.uniqueid}');
+      final folder = Directory('${downloadTransfer.folder}/manga-easy');
 
       if (await folder.exists()) {
         folder.deleteSync(recursive: true);
@@ -132,8 +148,6 @@ class DownloadController extends ChangeNotifier {
         print('A pasta não existe');
       }
     }
-
-    listDownload();
     notifyListeners();
   }
 }

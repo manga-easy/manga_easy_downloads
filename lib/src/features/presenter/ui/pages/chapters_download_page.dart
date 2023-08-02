@@ -19,7 +19,7 @@ class ChapterDownloadPage extends StatefulWidget {
 
 class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
   ChapterDownloadController ct = GetIt.I();
-  TextEditingController searchChapterController = TextEditingController();
+
 
   @override
   void initState() {
@@ -38,7 +38,8 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
         preferredSize: const Size(double.infinity, 50),
         child: CustomAppBar(
           title: ct.mangaDownload!.manga.title,
-          controller: searchChapterController,
+          textController: ct.searchChapterController,
+          cleanSearch: () => ct.cleanFilter(),
           keyboardType: TextInputType.number,
           onChanged: ct.filterList,
           listPopMenu: [

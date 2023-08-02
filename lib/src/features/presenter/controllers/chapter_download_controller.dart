@@ -14,7 +14,6 @@ class ChapterDownloadController extends ChangeNotifier {
   List<ChapterStatus> listFilterDownload = [];
   List<ChapterStatus> listMangaTodo = [];
   List<ChapterStatus> listFilterTodo = [];
-
   TextEditingController searchChapterController = TextEditingController();
 
   init(BuildContext context) {
@@ -51,6 +50,7 @@ class ChapterDownloadController extends ChangeNotifier {
   void deleteOneChapter(
       {required DownloadEntity mangaDownload,
       required ChapterStatus removeChapter}) async {
+    print(mangaDownload.folder);
     if (mangaDownload.chapters.length == 1) {
       deleteAllChapter(
           uniqueid: mangaDownload.uniqueid, folder: mangaDownload.folder);
@@ -58,6 +58,7 @@ class ChapterDownloadController extends ChangeNotifier {
       mangaDownload.chapters.removeWhere((e) => e == removeChapter);
       repository.update(data: mangaDownload, uniqueid: mangaDownload.uniqueid);
     }
+
     final file = Directory(
         '${mangaDownload.folder}/manga-easy/${mangaDownload.uniqueid}/${removeChapter.chapter.number}');
     if (await file.exists()) {
@@ -86,6 +87,13 @@ class ChapterDownloadController extends ChangeNotifier {
       listFilterDownload = List.from(listMangaDownload);
       listFilterTodo = List.from(listMangaTodo);
     }
+    notifyListeners();
+  }
+
+  void cleanFilter() {
+    searchChapterController.clear();
+    listFilterDownload = List.from(listMangaDownload);
+    listFilterTodo = List.from(listMangaTodo);
     notifyListeners();
   }
 }
