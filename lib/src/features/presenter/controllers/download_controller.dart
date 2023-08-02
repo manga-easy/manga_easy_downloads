@@ -59,17 +59,16 @@ class DownloadController extends ChangeNotifier {
     if (filter.isNotEmpty) {
       listFilterDownload = listDone
           .where((item) =>
-              item.manga.title.toLowerCase().contains(filter.toLowerCase()))
+              item.manga.title.toLowerCase().contains(filter.toLowerCase().trim()))
           .toList();
       listFilterTodo = listTodo
           .where((item) =>
-              item.manga.title.toLowerCase().contains(filter.toLowerCase()))
+              item.manga.title.toLowerCase().contains(filter.toLowerCase().trim()))
           .toList();
     } else {
       listFilterDownload = List.from(listDone);
       listFilterTodo = List.from(listTodo);
     }
-    print('aaaaaaaaaaaaaaaaaaa');
     notifyListeners();
   }
 
@@ -81,7 +80,6 @@ class DownloadController extends ChangeNotifier {
   }
 
   void listDownload() async {
-    print('BBBBBBBBBBBBBBBBBBBBB');
     listMangaDownloadTemp = await repository.list();
 
     listTodo =

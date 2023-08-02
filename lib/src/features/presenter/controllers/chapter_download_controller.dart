@@ -78,10 +78,10 @@ class ChapterDownloadController extends ChangeNotifier {
     }
     if (newFilter.isNotEmpty) {
       listFilterDownload = listMangaDownload
-          .where((item) => item.chapter.title.contains(newFilter))
+          .where((item) => item.chapter.title.contains(newFilter.trim()))
           .toList();
       listFilterTodo = listMangaDownload
-          .where((item) => item.chapter.title.contains(newFilter))
+          .where((item) => item.chapter.title.contains(newFilter.trim()))
           .toList();
     } else {
       listFilterDownload = List.from(listMangaDownload);
