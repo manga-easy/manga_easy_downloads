@@ -50,6 +50,38 @@ class DownloadController extends ChangeNotifier {
     return listMangaDownload.where((e) => e.status == Status.done).toList();
   }
 
+  String get chaptersTodo {
+    int chapters = 0;
+    for (var todo in listTodo) {
+      List<ChapterStatus> listChaptersTodo =
+          todo.chapters.where((e) => e.status != Status.done).toList();
+      chapters += listChaptersTodo.length;
+    }
+    if (chapters <= 1) {
+      return '$chapters capítulo em transferência';
+    }
+    return '$chapters capítulos em transferência';
+  }
+
+  String get chaptersDone {
+    int chapters = 0;
+    for (var done in listTodo) {
+      List<ChapterStatus> listChaptersDone =
+          done.chapters.where((e) => e.status == Status.done).toList();
+      chapters += listChaptersDone.length;
+    }
+    for (var done in listDone) {
+      List<ChapterStatus> listChaptersDone =
+          done.chapters.where((e) => e.status == Status.done).toList();
+      chapters += listChaptersDone.length;
+    }
+    if (chapters <= 1) {
+      return '$chapters capítulo baixado no total';
+    }
+
+    return '$chapters capítulos baixados no total';
+  }
+
   void init() async {
     listDownload();
     isPausedAll = await readPauseAllPref();

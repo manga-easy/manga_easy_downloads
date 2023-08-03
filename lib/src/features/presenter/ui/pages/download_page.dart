@@ -89,21 +89,8 @@ class _DownloadPageState extends State<DownloadPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ct.listTodo.length > 1
-                          //TODO REFATORAR ESSA CT.listTodo e done
-                          ? CoffeeText(
-                              text:
-                                  '${ct.listTodo.length} capítulos em transferência')
-                          : CoffeeText(
-                              text:
-                                  '${ct.listTodo.length} capítulo em transferência'),
-                      ct.listDone.length > 1
-                          ? CoffeeText(
-                              text:
-                                  '${ct.listDone.length} capítulos baixados no total')
-                          : CoffeeText(
-                              text:
-                                  '${ct.listDone.length} capítulo baixado no total'),
+                      CoffeeText(text: ct.chaptersTodo),
+                      CoffeeText(text: ct.chaptersDone),
                     ],
                   ),
                 ],

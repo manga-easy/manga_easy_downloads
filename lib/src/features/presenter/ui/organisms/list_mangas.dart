@@ -20,6 +20,7 @@ class ListMangas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 10),
         CoffeeText(
