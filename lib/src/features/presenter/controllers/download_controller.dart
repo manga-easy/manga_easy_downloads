@@ -20,18 +20,39 @@ class DownloadController extends ChangeNotifier {
 
   bool isPausedAll = false;
   bool isPaused = false;
-  List<DownloadEntity> listTodo = [];
-  List<DownloadEntity> listDone = [];
-  List<DownloadEntity> listMangaDownloadTemp = [];
-  List<DownloadEntity> listFilterDownload = [];
-  List<DownloadEntity> listFilterTodo = [];
+
+  List<DownloadEntity> listMangaDownload = [];
   TextEditingController searchController = TextEditingController();
+
+  List<DownloadEntity> get listTodo {
+    if (searchController.text.isNotEmpty) {
+      return listMangaDownload
+          .where((e) =>
+              e.status == Status.todo &&
+              e.manga.title
+                  .toLowerCase()
+                  .contains(searchController.text.toLowerCase().trim()))
+          .toList();
+    }
+    return listMangaDownload.where((e) => e.status == Status.todo).toList();
+  }
+
+  List<DownloadEntity> get listDone {
+    if (searchController.text.isNotEmpty) {
+      return listMangaDownload
+          .where((e) =>
+              e.status == Status.done &&
+              e.manga.title
+                  .toLowerCase()
+                  .contains(searchController.text.toLowerCase().trim()))
+          .toList();
+    }
+    return listMangaDownload.where((e) => e.status == Status.done).toList();
+  }
 
   void init() async {
     listDownload();
     isPausedAll = await readPauseAllPref();
-    listFilterDownload = List.from(listDone);
-    listFilterTodo = List.from(listTodo);
     _service.addListener(listDownload);
     notifyListeners();
   }
@@ -56,37 +77,16 @@ class DownloadController extends ChangeNotifier {
   }
 
   void filterList(String filter) {
-    if (filter.isNotEmpty) {
-      listFilterDownload = listDone
-          .where((item) =>
-              item.manga.title.toLowerCase().contains(filter.toLowerCase().trim()))
-          .toList();
-      listFilterTodo = listTodo
-          .where((item) =>
-              item.manga.title.toLowerCase().contains(filter.toLowerCase().trim()))
-          .toList();
-    } else {
-      listFilterDownload = List.from(listDone);
-      listFilterTodo = List.from(listTodo);
-    }
     notifyListeners();
   }
 
   void cleanFilter() {
-    listFilterDownload = List.from(listDone);
-    listFilterTodo = List.from(listTodo);
     searchController.clear();
     notifyListeners();
   }
 
-  void listDownload() async {
-    listMangaDownloadTemp = await repository.list();
-
-    listTodo =
-        listMangaDownloadTemp.where((e) => e.status == Status.todo).toList();
-
-    listDone =
-        listMangaDownloadTemp.where((e) => e.status == Status.done).toList();
+  Future<void> listDownload() async {
+    listMangaDownload = await repository.list();
 
     notifyListeners();
   }
@@ -127,17 +127,16 @@ class DownloadController extends ChangeNotifier {
     return totalKbytes > 1000 ? '$totalMegaByte MB' : '$totalKbytes kB';
   }
 
-  void progress(receivedBytes, totalBytes) {
-    if (totalBytes != -1) {
-      final progress = (receivedBytes / totalBytes * 100).toStringAsFixed(0);
-      // print('Progresso do download: $progress%');
-    }
-  }
+  // void progress(receivedBytes, totalBytes) {
+  //   if (totalBytes != -1) {
+  //     final progress = (receivedBytes / totalBytes * 100).toStringAsFixed(0);
+  //   }
+  // }
 
   void deleteAllDownload() async {
     await repository.deleteAll();
-    listDownload();
-    for (var downloadTransfer in listMangaDownloadTemp) {
+    await listDownload();
+    for (var downloadTransfer in listMangaDownload) {
       final folder = Directory('${downloadTransfer.folder}/manga-easy');
 
       if (await folder.exists()) {

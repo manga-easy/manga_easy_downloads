@@ -29,6 +29,12 @@ class _DownloadPageState extends State<DownloadPage> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    ct.dispose();
+    super.dispose();
+  }
+
   bool isSearch = false;
 
   @override
@@ -84,27 +90,28 @@ class _DownloadPageState extends State<DownloadPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ct.listFilterTodo.length > 1
+                      ct.listTodo.length > 1
+                      //TODO REFATORAR ESSA CT.listTodo e done
                           ? CoffeeText(
                               text:
-                                  '${ct.listFilterDownload.length} capítulos em transferência')
+                                  '${ct.listTodo.length} capítulos em transferência')
                           : CoffeeText(
                               text:
-                                  '${ct.listFilterTodo.length} capítulo em transferência'),
-                      ct.listFilterDownload.length > 1
+                                  '${ct.listTodo.length} capítulo em transferência'),
+                      ct.listDone.length > 1
                           ? CoffeeText(
                               text:
-                                  '${ct.listFilterDownload.length} capítulos baixados no total')
+                                  '${ct.listDone.length} capítulos baixados no total')
                           : CoffeeText(
                               text:
-                                  '${ct.listFilterDownload.length} capítulo baixado no total'),
+                                  '${ct.listDone.length} capítulo baixado no total'),
                     ],
                   ),
                 ],
               ),
             ),
             SliverVisibility(
-              visible: ct.listFilterTodo.isNotEmpty,
+              visible: ct.listTodo.isNotEmpty,
               sliver: const SliverPadding(
                 padding: EdgeInsets.symmetric(vertical: 10),
                 sliver: SliverToBoxAdapter(
@@ -116,12 +123,12 @@ class _DownloadPageState extends State<DownloadPage> {
               ),
             ),
             SliverVisibility(
-              visible: ct.listFilterTodo.isNotEmpty,
+              visible: ct.listTodo.isNotEmpty,
               sliver: ReorderableSliverList(
                 delegate: ReorderableSliverChildBuilderDelegate(
-                  childCount: ct.listFilterTodo.length,
+                  childCount: ct.listTodo.length,
                   (context, idx) {
-                    var mangaDownload = ct.listFilterTodo[idx];
+                    var mangaDownload = ct.listTodo[idx];
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 5),
                       child: ContainerMangaDownload(
@@ -139,8 +146,8 @@ class _DownloadPageState extends State<DownloadPage> {
                     if (newIndex > oldIndex) {
                       newIndex -= 1;
                     }
-                    final item = ct.listFilterTodo.removeAt(oldIndex);
-                    ct.listFilterTodo.insert(newIndex, item);
+                    final item = ct.listTodo.removeAt(oldIndex);
+                    ct.listTodo.insert(newIndex, item);
                   });
                 },
               ),
@@ -156,11 +163,11 @@ class _DownloadPageState extends State<DownloadPage> {
                   ),
                   const SizedBox(height: 10),
                   ListView.builder(
-                    itemCount: ct.listFilterDownload.length,
+                    itemCount: ct.listDone.length,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemBuilder: (context, idx) {
-                      var mangaDownload = ct.listFilterDownload[idx];
+                      var mangaDownload = ct.listDone[idx];
                       return ContainerMangaDownload(
                         mangaDownload: mangaDownload,
                         ct: ct,

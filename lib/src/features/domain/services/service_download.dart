@@ -54,9 +54,12 @@ class ServiceDownload extends ChangeNotifier {
   }
 
   // Adiciona um URL à fila de downloads
-  void enqueueDownload(Chapter chapter, String uniqueid) {
+  void enqueueDownload(Chapter chapter, String uniqueid) async {
     if (!isChapterInQueue(chapter, uniqueid)) {
       _downloadQueue.add(ChapterStatus(chapter, Status.doing, uniqueid));
+      await saveChapter(
+        chapter: ChapterStatus(chapter, Status.todo, uniqueid),
+      );
       _downloadNext();
     }
     notifyListeners();
@@ -93,6 +96,9 @@ class ServiceDownload extends ChangeNotifier {
 
   Future<void> _downloadChapter(ChapterStatus chapterStatus) async {
     List<ImageChapter> auxImage = [];
+    await saveChapter(
+      chapter: chapterStatus.copyWith(status: Status.doing),
+    );
     try {
       _currentChapter = chapterStatus;
       path = await _preference.get(
@@ -113,7 +119,7 @@ class ServiceDownload extends ChangeNotifier {
       if (!directory.existsSync()) {
         var status = await handler.Permission.storage.request();
         await directory.create(recursive: true);
-      //  if (status.isGranted) {}
+        //  if (status.isGranted) {}
       }
       final host = ApiManga.getByID(
         host: HostModel.empty()..host = 'http://api.lucas-cm.com.br',
@@ -153,15 +159,19 @@ class ServiceDownload extends ChangeNotifier {
           Helps.log(e);
         }
       }
-      chapterStatus.status = Status.done;
     } catch (e) {
-      chapterStatus.status = Status.error;
+      await saveChapter(
+        chapter: chapterStatus.copyWith(status: Status.error),
+      );
+
       Helps.log(e);
     }
     final chapter = chapterStatus.chapter.copyWith(imagens: auxImage);
     _currentChapter = null;
     isDownloading = false;
-    await saveChapter(chapter, chapterStatus.uniqueid);
+    await saveChapter(
+      chapter: chapterStatus.copyWith(status: Status.done, chapter: chapter),
+    );
     removeChapter(chapter, chapterStatus.uniqueid);
   }
 
@@ -169,15 +179,18 @@ class ServiceDownload extends ChangeNotifier {
     //cancelToken.cancel();
   }
 
-  Future<void> saveChapter(Chapter chapter, String uniqueid) async {
-    final download = await _downloadRepository.get(uniqueid: uniqueid);
+  Future<void> saveChapter({
+    required ChapterStatus chapter,
+  }) async {
+    final download = await _downloadRepository.get(uniqueid: chapter.uniqueid);
     download!.chapters.removeWhere(
-      (element) => element.chapter.title == chapter.title,
+      (element) => element.chapter.title == chapter.chapter.title,
     );
-    download.chapters.add(ChapterStatus(chapter, Status.done, uniqueid));
+    download.chapters.add(chapter);
+
     await _downloadRepository.update(
       data: download,
-      uniqueid: uniqueid,
+      uniqueid: chapter.uniqueid,
     );
   }
 
