@@ -68,7 +68,10 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 },
               ),
         PopupMenuButton(
-            icon: Icon(Icons.list, color: ThemeService.of.backgroundIcon),
+            icon: Icon(
+              Icons.more_vert,
+              color: ThemeService.of.backgroundIcon,
+            ),
             itemBuilder: (context) => widget.listPopMenu)
       ],
     );
