@@ -1,12 +1,14 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:manga_easy_downloads/manga_easy_downloads.dart';
 import 'package:manga_easy_downloads/src/features/domain/repositories/download_repository.dart';
 import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
 class ChapterDownloadController extends ChangeNotifier {
   final DownloadRepository repository;
+  final ServiceDownload _serviceDownload;
 
-  ChapterDownloadController(this.repository);
+  ChapterDownloadController(this.repository, this._serviceDownload);
 
   DownloadEntity? mangaDownload;
 
@@ -50,6 +52,18 @@ class ChapterDownloadController extends ChangeNotifier {
   void init(BuildContext context) {
     final arguments = ModalRoute.of(context)!.settings.arguments;
     mangaDownload = arguments as DownloadEntity;
+    _serviceDownload.addListener(list);
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _serviceDownload.removeListener(list);
+    super.dispose();
+  }
+
+  void list() async {
+    mangaDownload = await repository.get(uniqueid: mangaDownload!.uniqueid);
     notifyListeners();
   }
 
@@ -97,4 +111,16 @@ class ChapterDownloadController extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void removeChapterQueue(Chapter chapter) {
+    _serviceDownload.removeChapter(chapter, mangaDownload!.uniqueid);
+  }
+
+  double get progressDownload => _serviceDownload.downloadProgress;
+
+  bool currentChapterDownload(Chapter chapter) =>
+      _serviceDownload.isCurrentChapter(chapter, mangaDownload!.uniqueid);
+
+  bool isChapterInQueue(Chapter chapter) =>
+      _serviceDownload.isChapterInQueue(chapter, mangaDownload!.uniqueid);
 }

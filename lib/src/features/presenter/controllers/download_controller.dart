@@ -135,8 +135,6 @@ class DownloadController extends ChangeNotifier {
     }
   }
 
-  double downloadProgress = 0.0;
-
   String calculateFolderSize(String dirPath) {
     var dir = Directory(dirPath);
     int totalSize = 0;
@@ -159,11 +157,9 @@ class DownloadController extends ChangeNotifier {
     return totalKbytes > 1000 ? '$totalMegaByte MB' : '$totalKbytes kB';
   }
 
-  // void progress(receivedBytes, totalBytes) {
-  //   if (totalBytes != -1) {
-  //     final progress = (receivedBytes / totalBytes * 100).toStringAsFixed(0);
-  //   }
-  // }
+// int progress () {
+
+// }
 
   void deleteAllDownload() async {
     await repository.deleteAll();

@@ -46,6 +46,7 @@ class DownloadMicroApp extends MicroApp {
     getIt.registerFactory(
       () => ChapterDownloadController(
         getIt(),
+        getIt(),
       ),
     );
   }

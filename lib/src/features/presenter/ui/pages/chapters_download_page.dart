@@ -2,6 +2,7 @@ import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:manga_easy_downloads/src/features/presenter/controllers/chapter_download_controller.dart';
+import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/chapter_download_status.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_chapter_download.dart';
 import 'package:manga_easy_sdk/manga_easy_sdk.dart';
@@ -24,9 +25,17 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) => ct.init(context));
     ct.addListener(() {
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    ct.dispose();
+    super.dispose();
   }
 
   @override
@@ -115,13 +124,10 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                           chapters: chapter.title,
                           pages: '${chapter.imagens.length}',
                           icons: [
-                            CoffeeIconButton(
-                              onTap: () {},
-                              icon: Icons.download,
-                            ),
-                            CoffeeIconButton(
-                              onTap: () {},
-                              icon: Icons.cancel_outlined,
+                            ChapterDownloadStatus(
+                              chapter: chapter,
+                              ct: ct,
+                              removeChapter: ct.listChaptersTodo[idx],
                             ),
                           ],
                         );
