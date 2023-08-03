@@ -20,7 +20,6 @@ class ChapterDownloadPage extends StatefulWidget {
 class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
   ChapterDownloadController ct = GetIt.I();
 
-
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) => ct.init(context));
@@ -66,9 +65,16 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Expanded(
+              Expanded(
                 child: CoffeeButton(
                   label: 'Baixar mais capítulos',
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/manga',
+                      arguments: {'manga': ct.mangaDownload!.manga},
+                    );
+                  },
                 ),
               ),
               true
