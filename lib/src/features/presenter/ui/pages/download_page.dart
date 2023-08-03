@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
-import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_manga_download.dart';
+import 'package:manga_easy_downloads/src/features/presenter/ui/organisms/list_mangas.dart';
 import 'package:manga_easy_themes/manga_easy_themes.dart';
-import 'package:reorderables/reorderables.dart';
 
 class DownloadPage extends StatefulWidget {
   static const route = '/downloads-v2';
@@ -91,7 +90,7 @@ class _DownloadPageState extends State<DownloadPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ct.listTodo.length > 1
-                      //TODO REFATORAR ESSA CT.listTodo e done
+                          //TODO REFATORAR ESSA CT.listTodo e done
                           ? CoffeeText(
                               text:
                                   '${ct.listTodo.length} capítulos em transferência')
@@ -112,70 +111,23 @@ class _DownloadPageState extends State<DownloadPage> {
             ),
             SliverVisibility(
               visible: ct.listTodo.isNotEmpty,
-              sliver: const SliverPadding(
-                padding: EdgeInsets.symmetric(vertical: 10),
+              sliver: SliverPadding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
                 sliver: SliverToBoxAdapter(
-                  child: CoffeeText(
-                    text: 'Em Transferência',
-                    typography: CoffeeTypography.title,
+                  child: ListMangas(
+                    title: 'Em Transferência',
+                    listManga: ct.listTodo,
+                    ct: ct,
+                    isDownload: true,
                   ),
                 ),
-              ),
-            ),
-            SliverVisibility(
-              visible: ct.listTodo.isNotEmpty,
-              sliver: ReorderableSliverList(
-                delegate: ReorderableSliverChildBuilderDelegate(
-                  childCount: ct.listTodo.length,
-                  (context, idx) {
-                    var mangaDownload = ct.listTodo[idx];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5),
-                      child: ContainerMangaDownload(
-                        mangaDownload: mangaDownload,
-                        isDownload: true,
-                        downloadProgress: ct.downloadProgress,
-                        ct: ct,
-                        isPaused: ct.isPaused,
-                      ),
-                    );
-                  },
-                ),
-                onReorder: (oldIndex, newIndex) {
-                  setState(() {
-                    if (newIndex > oldIndex) {
-                      newIndex -= 1;
-                    }
-                    final item = ct.listTodo.removeAt(oldIndex);
-                    ct.listTodo.insert(newIndex, item);
-                  });
-                },
               ),
             ),
             SliverToBoxAdapter(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 10),
-                  const CoffeeText(
-                    text: 'Baixados',
-                    typography: CoffeeTypography.title,
-                  ),
-                  const SizedBox(height: 10),
-                  ListView.builder(
-                    itemCount: ct.listDone.length,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, idx) {
-                      var mangaDownload = ct.listDone[idx];
-                      return ContainerMangaDownload(
-                        mangaDownload: mangaDownload,
-                        ct: ct,
-                        isPaused: ct.isPaused,
-                      );
-                    },
-                  ),
-                ],
+              child: ListMangas(
+                title: 'Baixados',
+                listManga: ct.listDone,
+                ct: ct,
               ),
             ),
           ],
@@ -184,3 +136,31 @@ class _DownloadPageState extends State<DownloadPage> {
     );
   }
 }
+
+// ReorderableSliverList(
+//                 delegate: ReorderableSliverChildBuilderDelegate(
+//                   childCount: ct.listTodo.length,
+//                   (context, idx) {
+//                     var mangaDownload = ct.listTodo[idx];
+//                     return Padding(
+//                       padding: const EdgeInsets.symmetric(vertical: 5),
+//                       child: ContainerMangaDownload(
+//                         mangaDownload: mangaDownload,
+//                         isDownload: true,
+//                         downloadProgress: ct.downloadProgress,
+//                         ct: ct,
+//                         isPaused: ct.isPaused,
+//                       ),
+//                     );
+//                   },
+//                 ),
+//                 onReorder: (oldIndex, newIndex) {
+//                   setState(() {
+//                     if (newIndex > oldIndex) {
+//                       newIndex -= 1;
+//                     }
+//                     final item = ct.listTodo.removeAt(oldIndex);
+//                     ct.listTodo.insert(newIndex, item);
+//                   });
+//                 },
+//               ),

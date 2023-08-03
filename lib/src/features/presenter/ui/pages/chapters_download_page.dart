@@ -77,13 +77,13 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                   },
                 ),
               ),
-              true
-                  ? CoffeeIconButton(
-                      onTap: () {},
-                      icon: Icons.pause_circle,
-                      size: 50,
-                    )
-                  : SizedBox.shrink()
+              // true
+              //     ? CoffeeIconButton(
+              //         onTap: () {},
+              //         icon: Icons.pause_circle,
+              //         size: 50,
+              //       )
+              //     : SizedBox.shrink()
             ],
           ),
         ),

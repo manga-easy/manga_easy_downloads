@@ -8,12 +8,11 @@ class ContainerMangaDownload extends StatelessWidget {
   final double downloadProgress;
   final DownloadController ct;
   final bool isDownload;
-  final bool isPaused;
+  //final bool isPaused;
   final DownloadEntity mangaDownload;
   const ContainerMangaDownload({
     super.key,
     required this.ct,
-    required this.isPaused,
     this.isDownload = false,
     this.downloadProgress = 0.0,
     required this.mangaDownload,
@@ -99,23 +98,23 @@ class ContainerMangaDownload extends StatelessWidget {
                               ],
                             ),
                           ),
-                          isPaused
-                              ? IconButton(
-                                  icon: const Icon(
-                                    Icons.pause_circle_filled,
-                                    size: 30,
-                                  ),
-                                  visualDensity: VisualDensity.compact,
-                                  onPressed: () {},
-                                )
-                              : IconButton(
-                                  icon: const Icon(
-                                    Icons.play_circle,
-                                    size: 30,
-                                  ),
-                                  visualDensity: VisualDensity.compact,
-                                  onPressed: () {},
-                                ),
+                          // isPaused
+                          //     ? IconButton(
+                          //         icon: const Icon(
+                          //           Icons.pause_circle_filled,
+                          //           size: 30,
+                          //         ),
+                          //         visualDensity: VisualDensity.compact,
+                          //         onPressed: () {},
+                          //       )
+                          //     : IconButton(
+                          //         icon: const Icon(
+                          //           Icons.play_circle,
+                          //           size: 30,
+                          //         ),
+                          //         visualDensity: VisualDensity.compact,
+                          //         onPressed: () {},
+                          //       ),
                         ],
                       ),
                     ),
