@@ -106,11 +106,11 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                       typography: CoffeeTypography.title,
                     ),
                     ListView.builder(
-                      itemCount: ct.listFilterTodo.length,
+                      itemCount: ct.listChaptersTodo.length,
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, idx) {
-                        var chapter = ct.listFilterTodo[idx].chapter;
+                        var chapter = ct.listChaptersTodo[idx].chapter;
                         return ContainerChapterDownload(
                           chapters: chapter.title,
                           pages: '${chapter.imagens.length}',
@@ -141,11 +141,11 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                     typography: CoffeeTypography.title,
                   ),
                   ListView.builder(
-                    itemCount: ct.listFilterDownload.length,
+                    itemCount: ct.listChaptersDone.length,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemBuilder: (context, idx) {
-                      var chapter = ct.listFilterDownload[idx].chapter;
+                      var chapter = ct.listChaptersDone[idx].chapter;
                       return ContainerChapterDownload(
                         chapters: chapter.title,
                         pages: '${chapter.imagens.length}',
@@ -154,7 +154,7 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                             onTap: () {
                               ct.deleteOneChapter(
                                 mangaDownload: ct.mangaDownload!,
-                                removeChapter: ct.listFilterDownload[idx],
+                                removeChapter: ct.listChaptersDone[idx],
                               );
                             },
                             icon: Icons.delete_outline_sharp,

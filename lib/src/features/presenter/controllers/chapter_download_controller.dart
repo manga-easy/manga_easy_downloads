@@ -10,32 +10,62 @@ class ChapterDownloadController extends ChangeNotifier {
 
   DownloadEntity? mangaDownload;
 
-  List<ChapterStatus> listMangaDownload = [];
-  List<ChapterStatus> listFilterDownload = [];
-  List<ChapterStatus> listMangaTodo = [];
-  List<ChapterStatus> listFilterTodo = [];
   TextEditingController searchChapterController = TextEditingController();
 
-  init(BuildContext context) {
+  List<ChapterStatus> get listChaptersTodo {
+    if (searchChapterController.text.isNotEmpty) {
+      return mangaDownload!.chapters
+          .where((e) =>
+              e.status != Status.done &&
+              e.chapter.title.contains(searchChapterController.text.trim()))
+          .toList();
+    }
+
+    return mangaDownload!.chapters
+        .where((e) => e.status != Status.done)
+        .toList();
+  }
+
+  List<ChapterStatus> get listChaptersDone {
+    if (searchChapterController.text.isNotEmpty) {
+      return mangaDownload!.chapters
+          .where((e) =>
+              e.status == Status.done &&
+              e.chapter.title.contains(
+                searchChapterController.text.trim().length >= 2 &&
+                        searchChapterController.text.trim()[0] == '0'
+                    ? searchChapterController.text.substring(1).trim()
+                    : searchChapterController.text.trim(),
+              ))
+          .toList()
+        ..sort((a, b) =>
+            int.parse(a.chapter.title).compareTo(int.parse(b.chapter.title)));
+    }
+
+    return mangaDownload!.chapters
+        .where((e) => e.status == Status.done)
+        .toList();
+  }
+
+  void init(BuildContext context) {
     final arguments = ModalRoute.of(context)!.settings.arguments;
     mangaDownload = arguments as DownloadEntity;
-    listMangaDownload = mangaDownload!.chapters
-        .where((element) => element.status == Status.done)
-        .toList()
-      ..sort((a, b) =>
-          int.parse(a.chapter.title).compareTo(int.parse(b.chapter.title)));
-    listMangaTodo = mangaDownload!.chapters
-        .where((element) => element.status == Status.todo)
-        .toList();
-    listFilterDownload = List.from(listMangaDownload);
-    listFilterTodo = List.from(listMangaTodo);
+    notifyListeners();
+  }
+
+  void filterList(String filter) {
+    notifyListeners();
+  }
+
+  void cleanFilter() {
+    searchChapterController.clear();
     notifyListeners();
   }
 
   void deleteAllChapter(
       {required String uniqueid, required String folder}) async {
     await repository.delete(uniqueid: uniqueid);
-    final file = Directory('$folder/manga-easy/$uniqueid}');
+    final file = Directory('$folder/manga-easy/$uniqueid');
 
     if (await file.exists()) {
       file.deleteSync(recursive: true);
@@ -43,14 +73,12 @@ class ChapterDownloadController extends ChangeNotifier {
     } else {
       print('A pasta não existe');
     }
-    //TODO listDownload();
     notifyListeners();
   }
 
   void deleteOneChapter(
       {required DownloadEntity mangaDownload,
       required ChapterStatus removeChapter}) async {
-    print(mangaDownload.folder);
     if (mangaDownload.chapters.length == 1) {
       deleteAllChapter(
           uniqueid: mangaDownload.uniqueid, folder: mangaDownload.folder);
@@ -67,33 +95,6 @@ class ChapterDownloadController extends ChangeNotifier {
     } else {
       print('A pasta não existe');
     }
-    //TODO listDownload();
-    notifyListeners();
-  }
-
-  void filterList(String filter) {
-    var newFilter = filter;
-    if (filter.length >= 2 && filter[0] == '0') {
-      newFilter = filter.substring(1);
-    }
-    if (newFilter.isNotEmpty) {
-      listFilterDownload = listMangaDownload
-          .where((item) => item.chapter.title.contains(newFilter.trim()))
-          .toList();
-      listFilterTodo = listMangaDownload
-          .where((item) => item.chapter.title.contains(newFilter.trim()))
-          .toList();
-    } else {
-      listFilterDownload = List.from(listMangaDownload);
-      listFilterTodo = List.from(listMangaTodo);
-    }
-    notifyListeners();
-  }
-
-  void cleanFilter() {
-    searchChapterController.clear();
-    listFilterDownload = List.from(listMangaDownload);
-    listFilterTodo = List.from(listMangaTodo);
     notifyListeners();
   }
 }
