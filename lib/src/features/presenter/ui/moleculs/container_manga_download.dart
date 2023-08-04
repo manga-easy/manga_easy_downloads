@@ -5,7 +5,6 @@ import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 import 'package:manga_easy_themes/manga_easy_themes.dart';
 
 class ContainerMangaDownload extends StatelessWidget {
-  final double downloadProgress;
   final DownloadController ct;
   final bool isDownload;
   //final bool isPaused;
@@ -14,7 +13,6 @@ class ContainerMangaDownload extends StatelessWidget {
     super.key,
     required this.ct,
     this.isDownload = false,
-    this.downloadProgress = 0.0,
     required this.mangaDownload,
   });
 
@@ -87,7 +85,7 @@ class ContainerMangaDownload extends StatelessWidget {
                                     backgroundColor:
                                         ThemeService.of.selectColor,
                                     minHeight: 6,
-                                    value: downloadProgress,
+                                    value: ct.progress(mangaDownload),
                                   ),
                                 ),
                               ],

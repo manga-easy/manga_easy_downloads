@@ -97,11 +97,10 @@ class DownloadController extends ChangeNotifier {
   }
 
   Widget chaptersDoneInManga(DownloadEntity downloadEntity) {
-    int chapters = 0;
-
-    List<ChapterStatus> listChaptersDone =
-        downloadEntity.chapters.where((e) => e.status == Status.done).toList();
-    chapters += listChaptersDone.length;
+    int chapters = downloadEntity.chapters
+        .where((e) => e.status == Status.done)
+        .toList()
+        .length;
 
     if (chapters == 1) {
       return CoffeeText(text: '$chapters capítulo baixado no total');
@@ -113,11 +112,10 @@ class DownloadController extends ChangeNotifier {
   }
 
   Widget chaptersTodoInManga(DownloadEntity downloadEntity) {
-    int chapters = 0;
-
-    List<ChapterStatus> listChaptersDone =
-        downloadEntity.chapters.where((e) => e.status != Status.done).toList();
-    chapters += listChaptersDone.length;
+    int chapters = downloadEntity.chapters
+        .where((e) => e.status != Status.done)
+        .toList()
+        .length;
 
     if (chapters == 1) {
       return CoffeeText(text: '$chapters capítulo em transferência');
@@ -190,9 +188,16 @@ class DownloadController extends ChangeNotifier {
     return totalKbytes > 1000 ? '$totalMegaByte MB' : '$totalKbytes kB';
   }
 
-// int progress () {
+  double get progressDownload => _service.downloadProgress;
 
-// }
+  double progress(DownloadEntity downloadEntity) {
+    int chaptersDone = downloadEntity.chapters
+        .where((e) => e.status == Status.done)
+        .toList()
+        .length;
+
+    return chaptersDone / downloadEntity.chapters.length;
+  }
 
   void deleteAllDownload() async {
     await repository.deleteAll();
