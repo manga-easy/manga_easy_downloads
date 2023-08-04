@@ -52,13 +52,8 @@ class ContainerMangaDownload extends StatelessWidget {
                           maxLines: 2,
                           typography: CoffeeTypography.title,
                         ),
-                        '${mangaDownload.chapters.length}' == '1'
-                            ? CoffeeText(
-                                text:
-                                    '${mangaDownload.chapters.length} capítulo baixado')
-                            : CoffeeText(
-                                text:
-                                    '${mangaDownload.chapters.length} capítulos baixados'),
+                        ct.chaptersDoneInManga(mangaDownload),
+                        ct.chaptersTodoInManga(mangaDownload),
                         CoffeeText(
                           text: 'Host a modificar no container manga',
                           color:

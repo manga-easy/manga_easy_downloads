@@ -97,15 +97,12 @@ class _DownloadPageState extends State<DownloadPage> {
             ),
             SliverVisibility(
               visible: ct.listTodo.isNotEmpty,
-              sliver: SliverPadding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                sliver: SliverToBoxAdapter(
-                  child: ListMangas(
-                    title: 'Em Transferência',
-                    listManga: ct.listTodo,
-                    ct: ct,
-                    isDownload: true,
-                  ),
+              sliver: SliverToBoxAdapter(
+                child: ListMangas(
+                  title: 'Em Transferência',
+                  listManga: ct.listTodo,
+                  ct: ct,
+                  isDownload: true,
                 ),
               ),
             ),
