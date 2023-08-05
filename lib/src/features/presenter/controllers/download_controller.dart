@@ -21,7 +21,7 @@ class DownloadController extends ChangeNotifier {
 
   bool isPausedAll = false;
   bool isPaused = false;
-
+  int chaptersContDone = 0;
   List<DownloadEntity> listMangaDownload = [];
   TextEditingController searchController = TextEditingController();
 
@@ -191,12 +191,14 @@ class DownloadController extends ChangeNotifier {
   double get progressDownload => _service.downloadProgress;
 
   double progress(DownloadEntity downloadEntity) {
-    int chaptersDone = downloadEntity.chapters
+    double valueProgress =
+        (chaptersContDone + progressDownload) / downloadEntity.chapters.length;
+
+    chaptersContDone = downloadEntity.chapters
         .where((e) => e.status == Status.done)
         .toList()
         .length;
-
-    return chaptersDone / downloadEntity.chapters.length;
+    return valueProgress;
   }
 
   void deleteAllDownload() async {
