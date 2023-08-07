@@ -5,7 +5,6 @@ import 'package:manga_easy_downloads/src/features/presenter/controllers/chapter_
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/chapter_download_status.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_chapter_download.dart';
-import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 
 class ChapterDownloadPage extends StatefulWidget {
   static const route = '/chapters-download';
@@ -102,10 +101,7 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
         child: CustomScrollView(
           slivers: [
             SliverVisibility(
-              visible: ct.mangaDownload!.chapters
-                  .where((element) => element.status == Status.todo)
-                  .toList()
-                  .isNotEmpty,
+              visible: ct.listChaptersTodo.isNotEmpty,
               sliver: SliverToBoxAdapter(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
