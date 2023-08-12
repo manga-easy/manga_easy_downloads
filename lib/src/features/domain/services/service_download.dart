@@ -15,11 +15,13 @@ class ServiceDownload extends ChangeNotifier {
   final Preference _preference;
   final DownloadRepository _downloadRepository;
   final ClientRequest _clientRequest;
+  final MangaRepository _mangaRepository;
 
   ServiceDownload(
     this._preference,
     this._downloadRepository,
     this._clientRequest,
+    this._mangaRepository,
   );
 
   final _downloadQueue = <ChapterStatus>[];
@@ -121,12 +123,9 @@ class ServiceDownload extends ChangeNotifier {
         await directory.create(recursive: true);
         //  if (status.isGranted) {}
       }
-      final host = ApiManga.getByID(
-        host: HostModel.empty()..host = 'http://api.lucas-cm.com.br',
-        headers: Global.header,
-      );
-      final images = await host.getConteudoChapter(
+      final images = await _mangaRepository.getContentChapter(
         manga: chapterStatus.chapter.href,
+        idHost: await _idHostByChapter(chapterStatus.uniqueid),
       );
       var totalDone = 0;
       for (var image in images) {
@@ -153,7 +152,7 @@ class ServiceDownload extends ChangeNotifier {
             quality: 20,
           );
           //quando quebrar o bovinão arruma
-          await file.writeAsBytes(compressImage, mode: FileMode.write);
+          await file.writeAsBytes(compressImage);
           auxImage.add(image);
         } catch (e) {
           Helps.log(e);
@@ -170,7 +169,10 @@ class ServiceDownload extends ChangeNotifier {
     _currentChapter = null;
     isDownloading = false;
     await saveChapter(
-      chapter: chapterStatus.copyWith(status: Status.done, chapter: chapter),
+      chapter: chapterStatus.copyWith(
+        status: Status.done,
+        chapter: chapter,
+      ),
     );
     removeChapter(chapter, chapterStatus.uniqueid);
   }
@@ -225,5 +227,12 @@ class ServiceDownload extends ChangeNotifier {
       }
     }
     notifyListeners();
+  }
+
+  Future<int> _idHostByChapter(String uniqueid) async {
+    final result = await _downloadRepository.get(
+      uniqueid: uniqueid,
+    );
+    return result!.manga.idHost;
   }
 }
