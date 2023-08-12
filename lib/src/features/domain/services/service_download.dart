@@ -59,8 +59,13 @@ class ServiceDownload extends ChangeNotifier {
   void enqueueDownload(Chapter chapter, String uniqueid) async {
     if (!isChapterInQueue(chapter, uniqueid)) {
       _downloadQueue.add(ChapterStatus(chapter, Status.doing, uniqueid));
+      final images = await _mangaRepository.getContentChapter(
+        manga: chapter.href,
+        idHost: await _idHostByChapter(uniqueid),
+      );
+      final chapterImage = chapter.copyWith(imagens: images);
       await saveChapter(
-        chapter: ChapterStatus(chapter, Status.todo, uniqueid),
+        chapter: ChapterStatus(chapterImage, Status.todo, uniqueid),
       );
       _downloadNext();
     }
@@ -98,8 +103,14 @@ class ServiceDownload extends ChangeNotifier {
 
   Future<void> _downloadChapter(ChapterStatus chapterStatus) async {
     List<ImageChapter> auxImage = [];
+    final images = await _mangaRepository.getContentChapter(
+      manga: chapterStatus.chapter.href,
+      idHost: await _idHostByChapter(chapterStatus.uniqueid),
+    );
+    final chapterImage = chapterStatus.chapter.copyWith(imagens: images);
     await saveChapter(
-      chapter: chapterStatus.copyWith(status: Status.doing),
+      chapter:
+          chapterStatus.copyWith(status: Status.doing, chapter: chapterImage),
     );
     try {
       _currentChapter = chapterStatus;
