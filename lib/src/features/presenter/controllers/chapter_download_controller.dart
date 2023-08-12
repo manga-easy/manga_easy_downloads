@@ -17,9 +17,13 @@ class ChapterDownloadController extends ChangeNotifier {
   List<ChapterStatus> get listChaptersTodo {
     if (searchChapterController.text.isNotEmpty) {
       return mangaDownload!.chapters
-          .where((e) =>
-              e.status != Status.done &&
-              e.chapter.title.contains(searchChapterController.text.trim()))
+          .where(
+            (e) =>
+                e.status != Status.done &&
+                e.chapter.title.contains(
+                  searchChapterController.text.trim(),
+                ),
+          )
           .toList();
     }
 
@@ -40,8 +44,11 @@ class ChapterDownloadController extends ChangeNotifier {
                     : searchChapterController.text.trim(),
               ))
           .toList()
-        ..sort((a, b) =>
-            int.parse(a.chapter.title).compareTo(int.parse(b.chapter.title)));
+        ..sort(
+          (a, b) => int.parse(a.chapter.title).compareTo(
+            int.parse(b.chapter.title),
+          ),
+        );
     }
 
     return mangaDownload!.chapters
@@ -62,7 +69,7 @@ class ChapterDownloadController extends ChangeNotifier {
     super.dispose();
   }
 
-  void list() async {
+  Future<void> list() async {
     mangaDownload = await repository.get(uniqueid: mangaDownload!.uniqueid);
     notifyListeners();
   }
@@ -76,8 +83,10 @@ class ChapterDownloadController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteAllChapter(
-      {required String uniqueid, required String folder}) async {
+  Future<void> deleteAllChapter({
+    required String uniqueid,
+    required String folder,
+  }) async {
     await repository.delete(uniqueid: uniqueid);
     final file = Directory('$folder/manga-easy/$uniqueid');
 
@@ -90,19 +99,23 @@ class ChapterDownloadController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void deleteOneChapter(
-      {required DownloadEntity mangaDownload,
-      required ChapterStatus removeChapter}) async {
+  Future<void> deleteOneChapter({
+    required DownloadEntity mangaDownload,
+    required ChapterStatus removeChapter,
+  }) async {
     if (mangaDownload.chapters.length == 1) {
       deleteAllChapter(
-          uniqueid: mangaDownload.uniqueid, folder: mangaDownload.folder);
+        uniqueid: mangaDownload.uniqueid,
+        folder: mangaDownload.folder,
+      );
     } else {
       mangaDownload.chapters.removeWhere((e) => e == removeChapter);
       repository.update(data: mangaDownload, uniqueid: mangaDownload.uniqueid);
     }
 
     final file = Directory(
-        '${mangaDownload.folder}/manga-easy/${mangaDownload.uniqueid}/${removeChapter.chapter.number}');
+      '${mangaDownload.folder}/manga-easy/${mangaDownload.uniqueid}/${removeChapter.chapter.number}',
+    );
     if (await file.exists()) {
       file.deleteSync(recursive: true);
       print('Pasta excluída com sucesso');

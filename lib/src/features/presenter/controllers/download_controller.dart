@@ -28,11 +28,13 @@ class DownloadController extends ChangeNotifier {
   List<DownloadEntity> get listTodo {
     if (searchController.text.isNotEmpty) {
       return listMangaDownload
-          .where((e) =>
-              e.status == Status.todo &&
-              e.manga.title
-                  .toLowerCase()
-                  .contains(searchController.text.toLowerCase().trim()))
+          .where(
+            (e) =>
+                e.status == Status.todo &&
+                e.manga.title.toLowerCase().contains(
+                      searchController.text.toLowerCase().trim(),
+                    ),
+          )
           .toList();
     }
     return listMangaDownload.where((e) => e.status == Status.todo).toList();
@@ -41,11 +43,13 @@ class DownloadController extends ChangeNotifier {
   List<DownloadEntity> get listDone {
     if (searchController.text.isNotEmpty) {
       return listMangaDownload
-          .where((e) =>
-              e.status == Status.done &&
-              e.manga.title
-                  .toLowerCase()
-                  .contains(searchController.text.toLowerCase().trim()))
+          .where(
+            (e) =>
+                e.status == Status.done &&
+                e.manga.title
+                    .toLowerCase()
+                    .contains(searchController.text.toLowerCase().trim()),
+          )
           .toList();
     }
     return listMangaDownload.where((e) => e.status == Status.done).toList();
@@ -83,7 +87,7 @@ class DownloadController extends ChangeNotifier {
     return '$chapters capítulos baixados no total';
   }
 
-  void init() async {
+  Future<void> init() async {
     listDownload();
     isPausedAll = await readPauseAllPref();
     _service.addListener(listDownload);
@@ -126,7 +130,7 @@ class DownloadController extends ChangeNotifier {
     return const SizedBox.shrink();
   }
 
-  void savePauseAllPref() async {
+  Future<void> savePauseAllPref() async {
     isPausedAll = !isPausedAll;
     await _servicePrefs.put(
       keyPreferences: KeyPreferences.downloadPauseAll,
@@ -136,7 +140,8 @@ class DownloadController extends ChangeNotifier {
 
   Future<bool> readPauseAllPref() async {
     return await _servicePrefs.get<bool>(
-        keyPreferences: KeyPreferences.downloadPauseAll);
+      keyPreferences: KeyPreferences.downloadPauseAll,
+    );
   }
 
   void filterList(String filter) {
@@ -191,17 +196,15 @@ class DownloadController extends ChangeNotifier {
   double get progressDownload => _service.downloadProgress;
 
   double progress(DownloadEntity downloadEntity) {
-    double valueProgress =
-        (chaptersContDone + progressDownload) / downloadEntity.chapters.length;
-
     chaptersContDone = downloadEntity.chapters
         .where((e) => e.status == Status.done)
         .toList()
         .length;
+    double valueProgress = chaptersContDone / downloadEntity.chapters.length;
     return valueProgress;
   }
 
-  void deleteAllDownload() async {
+  Future<void> deleteAllDownload() async {
     await repository.deleteAll();
     await listDownload();
     for (var downloadTransfer in listMangaDownload) {
