@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:coffee_cup/coffe_cup.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
@@ -103,34 +102,34 @@ class DownloadController extends ChangeNotifier {
     super.dispose();
   }
 
-  Widget chaptersDoneInManga(DownloadEntity downloadEntity) {
+  String chaptersDoneInManga(DownloadEntity downloadEntity) {
     int chapters = downloadEntity.chapters
         .where((e) => e.status == Status.done)
         .toList()
         .length;
 
-    if (chapters == 1) {
-      return CoffeeText(text: '$chapters capítulo baixado no total');
-    }
     if (chapters > 1) {
-      return CoffeeText(text: '$chapters capítulos baixados no total');
+      return '$chapters capítulos baixados no total';
     }
-    return const SizedBox.shrink();
+    if (chapters == 1) {
+      return '$chapters capítulo baixado no total';
+    }
+    return '';
   }
 
-  Widget chaptersTodoInManga(DownloadEntity downloadEntity) {
+  String chaptersTodoInManga(DownloadEntity downloadEntity) {
     int chapters = downloadEntity.chapters
         .where((e) => e.status != Status.done)
         .toList()
         .length;
 
-    if (chapters == 1) {
-      return CoffeeText(text: '$chapters capítulo em transferência');
-    }
     if (chapters > 1) {
-      return CoffeeText(text: '$chapters capítulos em transferência');
+      return '$chapters capítulos em transferência';
     }
-    return const SizedBox.shrink();
+    if (chapters == 1) {
+      return '$chapters capítulo em transferência';
+    }
+    return '';
   }
 
   Future<void> savePauseAllPref() async {

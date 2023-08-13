@@ -50,8 +50,16 @@ class ContainerMangaDownload extends StatelessWidget {
                           maxLines: 2,
                           typography: CoffeeTypography.title,
                         ),
-                        ct.chaptersDoneInManga(mangaDownload),
-                        ct.chaptersTodoInManga(mangaDownload),
+                        ct.chaptersDoneInManga(mangaDownload).isNotEmpty
+                            ? CoffeeText(
+                                text: ct.chaptersDoneInManga(mangaDownload),
+                              )
+                            : SizedBox.shrink(),
+                        ct.chaptersTodoInManga(mangaDownload).isNotEmpty
+                            ? CoffeeText(
+                                text: ct.chaptersTodoInManga(mangaDownload),
+                              )
+                            : SizedBox.shrink(),
                         FutureBuilder(
                           future: ct.getNameHost(mangaDownload),
                           builder: (context, snap) {
@@ -67,7 +75,8 @@ class ContainerMangaDownload extends StatelessWidget {
                         ),
                         CoffeeText(
                           text: ct.calculateFolderSize(
-                              '${mangaDownload.folder}/manga-easy/${mangaDownload.uniqueid}'),
+                            '${mangaDownload.folder}/manga-easy/${mangaDownload.uniqueid}',
+                          ),
                           color:
                               ThemeService.of.backgroundText.withOpacity(0.5),
                         ),
