@@ -29,7 +29,8 @@ class ContainerChapterDownload extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CoffeeText(
-                  text: 'Capítulo ${chapters.toString().padLeft(2, '0')}',
+                  text:
+                      'Capítulo ${chapters.split(' ').last.toString().padLeft(2, '0')}',
                   typography: CoffeeTypography.button,
                 ),
                 CoffeeText(
