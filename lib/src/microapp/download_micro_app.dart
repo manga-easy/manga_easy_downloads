@@ -44,6 +44,7 @@ class DownloadMicroApp extends MicroApp {
         getIt(),
         getIt(),
         getIt(),
+        getIt(),
       ),
     );
     getIt.registerFactory(

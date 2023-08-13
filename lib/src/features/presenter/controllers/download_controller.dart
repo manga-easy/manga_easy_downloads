@@ -3,6 +3,7 @@ import 'package:coffee_cup/coffe_cup.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hosts/hosts.dart';
 import 'package:manga_easy_downloads/src/features/domain/repositories/download_repository.dart';
 import 'package:manga_easy_downloads/src/features/domain/services/service_download.dart';
 import 'package:manga_easy_sdk/manga_easy_sdk.dart';
@@ -12,11 +13,13 @@ class DownloadController extends ChangeNotifier {
   final DownloadRepository repository;
   final ServiceDownload _service;
   final Preference _servicePrefs;
+  final GetHostCase _getHostCase;
 
   DownloadController(
     this._service,
     this._servicePrefs,
     this.repository,
+    this._getHostCase,
   );
 
   bool isPausedAll = false;
@@ -217,5 +220,10 @@ class DownloadController extends ChangeNotifier {
       }
     }
     notifyListeners();
+  }
+
+  Future<String> getNameHost(DownloadEntity downloadEntity) async {
+    final result = await _getHostCase.call(downloadEntity.manga.idHost);
+    return result.info.name;
   }
 }

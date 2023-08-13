@@ -52,10 +52,18 @@ class ContainerMangaDownload extends StatelessWidget {
                         ),
                         ct.chaptersDoneInManga(mangaDownload),
                         ct.chaptersTodoInManga(mangaDownload),
-                        CoffeeText(
-                          text: 'Host a modificar no container manga',
-                          color:
-                              ThemeService.of.backgroundText.withOpacity(0.5),
+                        FutureBuilder(
+                          future: ct.getNameHost(mangaDownload),
+                          builder: (context, snap) {
+                            if (snap.hasData) {
+                              return CoffeeText(
+                                text: snap.data ?? 'N/A',
+                                color: ThemeService.of.backgroundText
+                                    .withOpacity(0.5),
+                              );
+                            }
+                            return LinearProgressIndicator();
+                          },
                         ),
                         CoffeeText(
                           text: ct.calculateFolderSize(
