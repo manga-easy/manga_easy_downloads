@@ -7,15 +7,14 @@ class DownloadMapper {
       uniqueid: json['uniqueid'],
       idUser: json['idUser'],
       createAt: DateTime.tryParse(json['createAt']) ?? DateTime.now(),
-      folder: json['folder'],
       manga: Manga.fromJson(json['manga']),
       chapters: (json['chapters'] as List)
           .map(
             (e) => ChapterStatus(
-              Chapter.fromJson(e['chapter']),
-              Status.values.firstWhere(
+              chapter: Chapter.fromJson(e['chapter']),
+              status: Status.values.firstWhere(
                   (s) => s.toString().split('.').last == e['status']),
-              e['uniqueid'],
+              uniqueid: e['uniqueid'],
             ),
           )
           .toList(),
@@ -28,7 +27,6 @@ class DownloadMapper {
       'uniqueid': data.uniqueid,
       'idUser': data.idUser,
       'createAt': data.createAt.toString(),
-      'folder': data.folder,
       'manga': data.manga.toJson(),
       'chapters': data.chapters
           .map((e) => {

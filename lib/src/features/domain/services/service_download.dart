@@ -56,17 +56,14 @@ class ServiceDownload extends ChangeNotifier {
   }
 
   // Adiciona um URL à fila de downloads
-  void enqueueDownload(Chapter chapter, String uniqueid) async {
+  void enqueueDownload(Chapter chapter, String uniqueid) {
     if (!isChapterInQueue(chapter, uniqueid)) {
-      _downloadQueue.add(ChapterStatus(chapter, Status.doing, uniqueid));
-      final images = await _mangaRepository.getContentChapter(
-        manga: chapter.href,
-        idHost: await _idHostByChapter(uniqueid),
+      final chapterStatus = ChapterStatus(
+        chapter: chapter,
+        status: Status.todo,
+        uniqueid: uniqueid,
       );
-      final chapterImage = chapter.copyWith(imagens: images);
-      await saveChapter(
-        chapter: ChapterStatus(chapterImage, Status.todo, uniqueid),
-      );
+      _downloadQueue.add(chapterStatus);
       _downloadNext();
     }
     notifyListeners();
@@ -96,21 +93,25 @@ class ServiceDownload extends ChangeNotifier {
     return totalImages > 0 ? completedImages / totalImages : 0.0;
   }
 
-  void progress(int totalImages, int completedImages) {
+  void _progress(int totalImages, int completedImages) {
     downloadProgress = getDownloadProgress(totalImages, completedImages);
     notifyListeners();
   }
 
   Future<void> _downloadChapter(ChapterStatus chapterStatus) async {
     List<ImageChapter> auxImage = [];
+    final pathChapter = '$path/manga-easy/${chapterStatus.uniqueid}/'
+        '${chapterStatus.chapter.number}';
     final images = await _mangaRepository.getContentChapter(
       manga: chapterStatus.chapter.href,
       idHost: await _idHostByChapter(chapterStatus.uniqueid),
     );
     final chapterImage = chapterStatus.chapter.copyWith(imagens: images);
-    await saveChapter(
-      chapter:
-          chapterStatus.copyWith(status: Status.doing, chapter: chapterImage),
+    await _saveChapter(
+      chapter: chapterStatus.copyWith(
+        status: Status.doing,
+        chapter: chapterImage,
+      ),
     );
     try {
       _currentChapter = chapterStatus;
@@ -126,7 +127,7 @@ class ServiceDownload extends ChangeNotifier {
       }
 
       var directory = Directory(
-        '$path/manga-easy/${chapterStatus.uniqueid}/${chapterStatus.chapter.number}',
+        pathChapter,
       );
 
       if (!directory.existsSync()) {
@@ -134,14 +135,10 @@ class ServiceDownload extends ChangeNotifier {
         await directory.create(recursive: true);
         //  if (status.isGranted) {}
       }
-      final images = await _mangaRepository.getContentChapter(
-        manga: chapterStatus.chapter.href,
-        idHost: await _idHostByChapter(chapterStatus.uniqueid),
-      );
       var totalDone = 0;
       for (var image in images) {
         try {
-          progress(images.length, totalDone);
+          _progress(images.length, totalDone);
           totalDone += 1;
           final file = File('${directory.path}/${image.src.split('/').last}');
           image.path = file.path;
@@ -170,8 +167,11 @@ class ServiceDownload extends ChangeNotifier {
         }
       }
     } catch (e) {
-      await saveChapter(
-        chapter: chapterStatus.copyWith(status: Status.error),
+      await _saveChapter(
+        chapter: chapterStatus.copyWith(
+          status: Status.error,
+          path: pathChapter,
+        ),
       );
 
       Helps.log(e);
@@ -179,10 +179,11 @@ class ServiceDownload extends ChangeNotifier {
     final chapter = chapterStatus.chapter.copyWith(imagens: auxImage);
     _currentChapter = null;
     isDownloading = false;
-    await saveChapter(
+    await _saveChapter(
       chapter: chapterStatus.copyWith(
         status: Status.done,
         chapter: chapter,
+        path: pathChapter,
       ),
     );
     removeChapter(chapter, chapterStatus.uniqueid);
@@ -192,7 +193,7 @@ class ServiceDownload extends ChangeNotifier {
     //cancelToken.cancel();
   }
 
-  Future<void> saveChapter({
+  Future<void> _saveChapter({
     required ChapterStatus chapter,
   }) async {
     final download = await _downloadRepository.get(uniqueid: chapter.uniqueid);
@@ -211,22 +212,24 @@ class ServiceDownload extends ChangeNotifier {
     path = await _preference.get(
       keyPreferences: KeyPreferences.downloadFolder,
     );
-    try {
-      final dir = Directory(
-        '$path/manga-easy/$uniqueid/${chapter.number}',
-      );
-      await dir.delete(recursive: true);
-    } on Exception catch (e) {
-      Helps.log(e);
-    }
     final result = await _downloadRepository.get(
       uniqueid: uniqueid,
     );
     if (result != null) {
-      //remove o capitulo dos downloads
-      result.chapters.removeWhere(
+      final index = result.chapters.indexWhere(
         (element) => element.chapter.title == chapter.title,
       );
+      final chapterStatus = result.chapters.elementAt(index);
+      try {
+        final dir = Directory(
+          chapterStatus.path!,
+        );
+        await dir.delete(recursive: true);
+      } on Exception catch (e) {
+        Helps.log(e);
+      }
+      //remove o capitulo dos downloads
+      result.chapters.removeAt(index);
       //se não tiver mais capitulos depois que removeu limpa o download entity tbm
       if (result.chapters.isEmpty) {
         await _downloadRepository.delete(uniqueid: result.uniqueid);

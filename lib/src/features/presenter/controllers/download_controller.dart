@@ -223,6 +223,6 @@ class DownloadController extends ChangeNotifier {
 
   Future<String> getNameHost(DownloadEntity downloadEntity) async {
     final result = await _getHostCase.call(downloadEntity.manga.idHost);
-    return result.info.name;
+    return result.name;
   }
 }
