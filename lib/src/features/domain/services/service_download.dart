@@ -158,7 +158,7 @@ class ServiceDownload extends ChangeNotifier {
 
           var compressImage = await FlutterImageCompress.compressWithList(
             response.data,
-            quality: 100,
+            quality: 20,
           );
           //quando quebrar o bovinão arruma
           await file.writeAsBytes(compressImage);
