@@ -13,7 +13,9 @@ class DownloadMapper {
             (e) => ChapterStatus(
               chapter: Chapter.fromJson(e['chapter']),
               status: Status.values.firstWhere(
-                  (s) => s.toString().split('.').last == e['status']),
+                (s) => s.toString().split('.').last == e['status'],
+              ),
+              path: e['path'],
               uniqueid: e['uniqueid'],
             ),
           )
@@ -29,11 +31,14 @@ class DownloadMapper {
       'createAt': data.createAt.toString(),
       'manga': data.manga.toJson(),
       'chapters': data.chapters
-          .map((e) => {
-                'chapter': e.chapter.toJson(),
-                'status': e.status.name,
-                'uniqueid': e.uniqueid,
-              })
+          .map(
+            (e) => {
+              'chapter': e.chapter.toJson(),
+              'status': e.status.name,
+              'uniqueid': e.uniqueid,
+              'path': e.path,
+            },
+          )
           .toList(),
     };
   }

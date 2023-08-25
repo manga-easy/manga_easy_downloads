@@ -56,12 +56,20 @@ class ServiceDownload extends ChangeNotifier {
   }
 
   // Adiciona um URL à fila de downloads
-  void enqueueDownload(Chapter chapter, String uniqueid) {
+  Future<void> enqueueDownload(Chapter chapter, String uniqueid) async {
+    if (path == null) {
+      path = await FilePicker.platform.getDirectoryPath();
+      await _preference.put(
+        keyPreferences: KeyPreferences.downloadFolder,
+        value: path,
+      );
+    }
     if (!isChapterInQueue(chapter, uniqueid)) {
       final chapterStatus = ChapterStatus(
         chapter: chapter,
         status: Status.todo,
         uniqueid: uniqueid,
+        path: path!,
       );
       _downloadQueue.add(chapterStatus);
       _downloadNext();
@@ -118,13 +126,6 @@ class ServiceDownload extends ChangeNotifier {
       path = await _preference.get(
         keyPreferences: KeyPreferences.downloadFolder,
       );
-      if (path == null) {
-        path = await FilePicker.platform.getDirectoryPath();
-        await _preference.put(
-          keyPreferences: KeyPreferences.downloadFolder,
-          value: path,
-        );
-      }
 
       var directory = Directory(
         pathChapter,
@@ -157,7 +158,7 @@ class ServiceDownload extends ChangeNotifier {
 
           var compressImage = await FlutterImageCompress.compressWithList(
             response.data,
-            quality: 20,
+            quality: 100,
           );
           //quando quebrar o bovinão arruma
           await file.writeAsBytes(compressImage);
@@ -200,7 +201,10 @@ class ServiceDownload extends ChangeNotifier {
     download!.chapters.removeWhere(
       (element) => element.chapter.title == chapter.chapter.title,
     );
-    download.chapters.add(chapter);
+
+    download.chapters.add(
+      chapter,
+    );
 
     await _downloadRepository.update(
       data: download,
@@ -222,7 +226,7 @@ class ServiceDownload extends ChangeNotifier {
       final chapterStatus = result.chapters.elementAt(index);
       try {
         final dir = Directory(
-          chapterStatus.path!,
+          chapterStatus.path,
         );
         await dir.delete(recursive: true);
       } on Exception catch (e) {

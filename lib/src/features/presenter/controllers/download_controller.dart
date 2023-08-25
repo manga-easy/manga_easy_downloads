@@ -173,18 +173,20 @@ class DownloadController extends ChangeNotifier {
     }
   }
 
-  String calculateFolderSize(String dirPath) {
-    var dir = Directory(dirPath);
+  String calculateFolderSize(List<ChapterStatus> chapters) {
     int totalSize = 0;
     try {
-      if (dir.existsSync()) {
-        dir
-            .listSync(recursive: true, followLinks: false)
-            .forEach((FileSystemEntity entity) {
-          if (entity is File) {
-            totalSize += entity.lengthSync();
-          }
-        });
+      for (var chapter in chapters) {
+        var dir = Directory(chapter.path);
+        if (dir.existsSync()) {
+          dir
+              .listSync(recursive: true, followLinks: false)
+              .forEach((FileSystemEntity entity) {
+            if (entity is File) {
+              totalSize += entity.lengthSync();
+            }
+          });
+        }
       }
     } catch (e) {
       return 'N/A';

@@ -7,7 +7,6 @@ import 'package:manga_easy_themes/manga_easy_themes.dart';
 class ContainerMangaDownload extends StatelessWidget {
   final DownloadController ct;
   final bool isDownload;
-  //final bool isPaused;
   final DownloadEntity mangaDownload;
   const ContainerMangaDownload({
     super.key,
@@ -74,9 +73,7 @@ class ContainerMangaDownload extends StatelessWidget {
                           },
                         ),
                         CoffeeText(
-                          text: ct.calculateFolderSize(
-                            '${mangaDownload.folder}/manga-easy/${mangaDownload.uniqueid}',
-                          ),
+                          text: ct.calculateFolderSize(mangaDownload.chapters),
                           color:
                               ThemeService.of.backgroundText.withOpacity(0.5),
                         ),
