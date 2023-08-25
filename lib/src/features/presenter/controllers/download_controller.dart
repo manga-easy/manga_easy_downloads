@@ -207,15 +207,9 @@ class DownloadController extends ChangeNotifier {
   }
 
   Future<void> deleteAllDownload() async {
-    await repository.deleteAll();
-    await listDownload();
-    for (var downloadTransfer in listMangaDownload) {
-      final folder = Directory('${downloadTransfer.folder}/manga-easy');
-
-      if (await folder.exists()) {
-        folder.deleteSync(recursive: true);
-      } else {
-        print('A pasta não existe');
+    for (var downloadMangas in listMangaDownload) {
+      for (var chapter in downloadMangas.chapters) {
+        _service.deleteChapter(chapter.chapter, chapter.uniqueid);
       }
     }
     notifyListeners();
