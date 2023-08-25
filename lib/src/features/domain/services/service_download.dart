@@ -226,7 +226,7 @@ class ServiceDownload extends ChangeNotifier {
       final chapterStatus = result.chapters.elementAt(index);
       try {
         final dir = Directory(
-          chapterStatus.path,
+          chapterStatus.path!,
         );
         await dir.delete(recursive: true);
       } on Exception catch (e) {

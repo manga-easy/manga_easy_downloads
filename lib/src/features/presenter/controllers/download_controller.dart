@@ -177,7 +177,7 @@ class DownloadController extends ChangeNotifier {
     int totalSize = 0;
     try {
       for (var chapter in chapters) {
-        var dir = Directory(chapter.path);
+        var dir = Directory(chapter.path!);
         if (dir.existsSync()) {
           dir
               .listSync(recursive: true, followLinks: false)
