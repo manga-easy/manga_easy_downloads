@@ -148,20 +148,29 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                     physics: const NeverScrollableScrollPhysics(),
                     itemBuilder: (context, idx) {
                       var chapter = ct.listChaptersDone[idx].chapter;
-                      return ContainerChapterDownload(
-                        chapters: chapter.title,
-                        pages: '${chapter.imagens.length}',
-                        icons: [
-                          CoffeeIconButton(
-                            onTap: () {
-                              ct.deleteOneChapter(
-                                chapter: ct.listChaptersDone[idx].chapter,
-                                uniqueId: ct.listChaptersDone[idx].uniqueid,
-                              );
-                            },
-                            icon: Icons.delete_outline_sharp,
-                          ),
-                        ],
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/chapter',
+                            arguments: ct.mangaDownload!.manga,
+                          );
+                        },
+                        child: ContainerChapterDownload(
+                          chapters: chapter.title,
+                          pages: '${chapter.imagens.length}',
+                          icons: [
+                            CoffeeIconButton(
+                              onTap: () {
+                                ct.deleteOneChapter(
+                                  chapter: ct.listChaptersDone[idx].chapter,
+                                  uniqueId: ct.listChaptersDone[idx].uniqueid,
+                                );
+                              },
+                              icon: Icons.delete_outline_sharp,
+                            ),
+                          ],
+                        ),
                       );
                     },
                   ),
