@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:manga_easy_downloads/manga_easy_downloads.dart';
 import 'package:manga_easy_downloads/src/features/domain/repositories/download_repository.dart';
@@ -35,14 +34,16 @@ class ChapterDownloadController extends ChangeNotifier {
   List<ChapterStatus> get listChaptersDone {
     if (searchChapterController.text.isNotEmpty) {
       return mangaDownload!.chapters
-          .where((e) =>
-              e.status == Status.done &&
-              e.chapter.title.contains(
-                searchChapterController.text.trim().length >= 2 &&
-                        searchChapterController.text.trim()[0] == '0'
-                    ? searchChapterController.text.substring(1).trim()
-                    : searchChapterController.text.trim(),
-              ))
+          .where(
+            (e) =>
+                e.status == Status.done &&
+                e.chapter.title.contains(
+                  searchChapterController.text.trim().length >= 2 &&
+                          searchChapterController.text.trim()[0] == '0'
+                      ? searchChapterController.text.substring(1).trim()
+                      : searchChapterController.text.trim(),
+                ),
+          )
           .toList()
         ..sort(
           (a, b) => int.parse(a.chapter.title).compareTo(
@@ -84,44 +85,26 @@ class ChapterDownloadController extends ChangeNotifier {
   }
 
   Future<void> deleteAllChapter({
-    required String uniqueid,
-    required String folder,
+    required List<ChapterStatus> chapters,
   }) async {
-    await repository.delete(uniqueid: uniqueid);
-    final file = Directory('$folder/manga-easy/$uniqueid');
-
-    if (await file.exists()) {
-      file.deleteSync(recursive: true);
-      print('Pasta excluída com sucesso');
-    } else {
-      print('A pasta não existe');
+    for (var chapter in chapters) {
+       _serviceDownload.deleteChapter(
+        chapter.chapter,
+        chapter.uniqueid,
+      );
     }
     notifyListeners();
   }
 
   Future<void> deleteOneChapter({
-    required DownloadEntity mangaDownload,
-    required ChapterStatus removeChapter,
+    required Chapter chapter,
+    required String uniqueId,
   }) async {
-    if (mangaDownload.chapters.length == 1) {
-      deleteAllChapter(
-        uniqueid: mangaDownload.uniqueid,
-        folder: mangaDownload.folder,
-      );
-    } else {
-      mangaDownload.chapters.removeWhere((e) => e == removeChapter);
-      repository.update(data: mangaDownload, uniqueid: mangaDownload.uniqueid);
-    }
-
-    final file = Directory(
-      '${mangaDownload.folder}/manga-easy/${mangaDownload.uniqueid}/${removeChapter.chapter.number}',
+    await _serviceDownload.deleteChapter(
+      chapter,
+      uniqueId,
     );
-    if (await file.exists()) {
-      file.deleteSync(recursive: true);
-      print('Pasta excluída com sucesso');
-    } else {
-      print('A pasta não existe');
-    }
+
     notifyListeners();
   }
 

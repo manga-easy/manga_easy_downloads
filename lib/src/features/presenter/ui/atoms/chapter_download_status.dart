@@ -6,13 +6,13 @@ import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 class ChapterDownloadStatus extends StatelessWidget {
   final ChapterDownloadController ct;
   final Chapter chapter;
-  final ChapterStatus removeChapter;
+  final String uniqueid;
 
   const ChapterDownloadStatus({
     super.key,
     required this.ct,
     required this.chapter,
-    required this.removeChapter,
+    required this.uniqueid,
   });
 
   @override
@@ -26,12 +26,15 @@ class ChapterDownloadStatus extends StatelessWidget {
       return CoffeeIconButton(
         onTap: () {
           ct.deleteOneChapter(
-              mangaDownload: ct.mangaDownload!, removeChapter: removeChapter);
+            chapter: chapter,
+            uniqueId: uniqueid,
+          );
           ct.removeChapterQueue(chapter);
         },
         icon: Icons.stop_circle_outlined,
       );
     }
-    return const CircularProgressIndicator();
+    return Icon(Icons.error);
+    //TODO AJEITAR ISSO AI PRA ERRO
   }
 }

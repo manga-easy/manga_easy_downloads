@@ -54,8 +54,8 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
               onTap: () {
                 setState(() {
                   ct.deleteAllChapter(
-                      uniqueid: ct.mangaDownload!.uniqueid,
-                      folder: ct.mangaDownload!.folder);
+                    chapters: ct.mangaDownload!.chapters,
+                  );
                 });
               },
               child: const CoffeeText(text: 'Limpar todos os downloads'),
@@ -115,15 +115,15 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, idx) {
-                        var chapter = ct.listChaptersTodo[idx].chapter;
+                        var chapter = ct.listChaptersTodo[idx];
                         return ContainerChapterDownload(
-                          chapters: chapter.title,
-                          pages: '${chapter.imagens.length}',
+                          chapters: chapter.chapter.title,
+                          pages: '${chapter.chapter.imagens.length}',
                           icons: [
                             ChapterDownloadStatus(
-                              chapter: chapter,
+                              chapter: chapter.chapter,
+                              uniqueid: chapter.uniqueid,
                               ct: ct,
-                              removeChapter: ct.listChaptersTodo[idx],
                             ),
                           ],
                         );
@@ -155,8 +155,8 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                           CoffeeIconButton(
                             onTap: () {
                               ct.deleteOneChapter(
-                                mangaDownload: ct.mangaDownload!,
-                                removeChapter: ct.listChaptersDone[idx],
+                                chapter: ct.listChaptersDone[idx].chapter,
+                                uniqueId: ct.listChaptersDone[idx].uniqueid,
                               );
                             },
                             icon: Icons.delete_outline_sharp,
@@ -164,7 +164,7 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                         ],
                       );
                     },
-                  )
+                  ),
                 ],
               ),
             ),
@@ -172,7 +172,7 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
               child: SizedBox(
                 height: 80,
               ),
-            )
+            ),
           ],
         ),
       ),

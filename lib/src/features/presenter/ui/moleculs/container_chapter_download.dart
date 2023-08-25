@@ -9,7 +9,7 @@ class ContainerChapterDownload extends StatelessWidget {
       {super.key,
       required this.icons,
       required this.chapters,
-      required this.pages});
+      required this.pages,});
 
   String convertPage(String page) {
     if (page.toString() == '1') {
