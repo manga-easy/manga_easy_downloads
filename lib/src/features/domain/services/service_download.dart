@@ -123,19 +123,7 @@ class ServiceDownload extends ChangeNotifier {
     );
     try {
       _currentChapter = chapterStatus;
-      path = await _preference.get(
-        keyPreferences: KeyPreferences.downloadFolder,
-      );
-
-      var directory = Directory(
-        pathChapter,
-      );
-
-      if (!directory.existsSync()) {
-        var status = await handler.Permission.storage.request();
-        await directory.create(recursive: true);
-        //  if (status.isGranted) {}
-      }
+      final directory = await createDir(pathChapter);
       var totalDone = 0;
       for (var image in images) {
         try {
@@ -198,7 +186,10 @@ class ServiceDownload extends ChangeNotifier {
     required ChapterStatus chapter,
   }) async {
     final download = await _downloadRepository.get(uniqueid: chapter.uniqueid);
-    download!.chapters.removeWhere(
+    if (download == null) {
+      return;
+    }
+    download.chapters.removeWhere(
       (element) => element.chapter.title == chapter.chapter.title,
     );
 
@@ -213,9 +204,6 @@ class ServiceDownload extends ChangeNotifier {
   }
 
   Future<void> deleteChapter(Chapter chapter, String uniqueid) async {
-    path = await _preference.get(
-      keyPreferences: KeyPreferences.downloadFolder,
-    );
     final result = await _downloadRepository.get(
       uniqueid: uniqueid,
     );
@@ -252,5 +240,17 @@ class ServiceDownload extends ChangeNotifier {
       uniqueid: uniqueid,
     );
     return result!.manga.idHost;
+  }
+
+  Future<Directory> createDir(String pathChapter) async {
+    await handler.Permission.manageExternalStorage.request();
+    await handler.Permission.storage.request();
+
+    var directory = Directory(
+      pathChapter,
+    );
+
+    await directory.create(recursive: true);
+    return directory;
   }
 }
