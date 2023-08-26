@@ -62,6 +62,7 @@ class ServiceDownload extends ChangeNotifier {
         uniqueid: uniqueid,
         path: _path!,
       );
+      _saveChapter(chapter: chapterStatus);
       _downloadQueue.add(chapterStatus);
     }
     _downloadNext();
