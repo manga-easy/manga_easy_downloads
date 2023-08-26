@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:client_driver/client_driver.dart';
 import 'package:dio/dio.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -14,20 +13,18 @@ import 'package:permission_handler/permission_handler.dart' as handler;
 class ServiceDownload extends ChangeNotifier {
   final Preference _preference;
   final DownloadRepository _downloadRepository;
-  final ClientRequest _clientRequest;
   final MangaRepository _mangaRepository;
 
   ServiceDownload(
     this._preference,
     this._downloadRepository,
-    this._clientRequest,
     this._mangaRepository,
   );
 
   final _downloadQueue = <ChapterStatus>[];
   bool isDownloading = false;
   double downloadProgress = 0.0;
-  String? path;
+  String? _path;
 
   ChapterStatus? _currentChapter;
 
@@ -57,27 +54,21 @@ class ServiceDownload extends ChangeNotifier {
 
   // Adiciona um URL à fila de downloads
   Future<void> enqueueDownload(Chapter chapter, String uniqueid) async {
-    if (path == null) {
-      path = await FilePicker.platform.getDirectoryPath();
-      await _preference.put(
-        keyPreferences: KeyPreferences.downloadFolder,
-        value: path,
-      );
-    }
+    await loadingPath();
     if (!isChapterInQueue(chapter, uniqueid)) {
       final chapterStatus = ChapterStatus(
         chapter: chapter,
         status: Status.todo,
         uniqueid: uniqueid,
-        path: path!,
+        path: _path!,
       );
       _downloadQueue.add(chapterStatus);
-      _downloadNext();
     }
+    _downloadNext();
     notifyListeners();
   }
 
-  void removeChapter(Chapter chapter, String uniqueid) {
+  void removeChapterFromQueue(Chapter chapter, String uniqueid) {
     _downloadQueue.removeWhere(
       (element) =>
           element.uniqueid == uniqueid &&
@@ -108,7 +99,7 @@ class ServiceDownload extends ChangeNotifier {
 
   Future<void> _downloadChapter(ChapterStatus chapterStatus) async {
     List<ImageChapter> auxImage = [];
-    final pathChapter = '$path/manga-easy/${chapterStatus.uniqueid}/'
+    final pathChapter = '$_path/manga-easy/${chapterStatus.uniqueid}/'
         '${chapterStatus.chapter.number}';
     final images = await _mangaRepository.getContentChapter(
       manga: chapterStatus.chapter.href,
@@ -175,7 +166,7 @@ class ServiceDownload extends ChangeNotifier {
         path: pathChapter,
       ),
     );
-    removeChapter(chapter, chapterStatus.uniqueid);
+    removeChapterFromQueue(chapter, chapterStatus.uniqueid);
   }
 
   void pauseDownload() {
@@ -252,5 +243,18 @@ class ServiceDownload extends ChangeNotifier {
 
     await directory.create(recursive: true);
     return directory;
+  }
+
+  Future<void> loadingPath() async {
+    _path = await _preference.get(
+      keyPreferences: KeyPreferences.downloadFolder,
+    );
+    if (_path == null) {
+      _path = await FilePicker.platform.getDirectoryPath();
+      await _preference.put(
+        keyPreferences: KeyPreferences.downloadFolder,
+        value: _path,
+      );
+    }
   }
 }

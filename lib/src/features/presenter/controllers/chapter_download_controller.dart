@@ -114,7 +114,7 @@ class ChapterDownloadController extends ChangeNotifier {
   }
 
   void removeChapterQueue(Chapter chapter) {
-    _serviceDownload.removeChapter(chapter, mangaDownload!.uniqueid);
+    _serviceDownload.removeChapterFromQueue(chapter, mangaDownload!.uniqueid);
   }
 
   double get progressDownload => _serviceDownload.downloadProgress;
