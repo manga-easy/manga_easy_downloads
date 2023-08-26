@@ -5,6 +5,7 @@ import 'package:manga_easy_downloads/src/features/presenter/controllers/chapter_
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/chapter_download_status.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/moleculs/container_chapter_download.dart';
+import 'package:manga_easy_downloads/src/microapp/external_routes.dart';
 
 class ChapterDownloadPage extends StatefulWidget {
   static const route = '/chapters-download';
@@ -79,8 +80,10 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                   onPressed: () {
                     Navigator.pushNamed(
                       context,
-                      '/manga',
-                      arguments: {'manga': ct.mangaDownload!.manga},
+                      ExternalRoutes.manga,
+                      arguments: {
+                        'manga': ct.mangaDownload!.manga,
+                      },
                     );
                   },
                 ),
@@ -152,10 +155,13 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                         onTap: () {
                           Navigator.pushNamed(
                             context,
-                            '/chapter',
+                            ExternalRoutes.chapter,
                             arguments: {
-                              'manga': ct.mangaDownload!.manga,
-                              'chapter': chapter,
+                              'manga': ct.mangaDownload!.manga.toJson(),
+                              'chapters': ct.listChaptersDone
+                                  .map((e) => e.chapter.toJson())
+                                  .toList(),
+                              'chapter': chapter.toJson(),
                             },
                           );
                         },
