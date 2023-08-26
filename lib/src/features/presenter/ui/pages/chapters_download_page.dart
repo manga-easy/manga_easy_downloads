@@ -52,12 +52,9 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
           onChanged: ct.filterList,
           listPopMenu: [
             PopupMenuItem(
-              onTap: () {
-                setState(() {
-                  ct.deleteAllChapter(
-                    chapters: ct.mangaDownload!.chapters,
-                  );
-                });
+              onTap: () async {
+                await ct.deleteAllChapter(chapters: ct.mangaDownload!.chapters);
+                Navigator.pop(context);
               },
               child: const CoffeeText(text: 'Limpar todos os downloads'),
             ),
@@ -88,13 +85,6 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                   },
                 ),
               ),
-              // true
-              //     ? CoffeeIconButton(
-              //         onTap: () {},
-              //         icon: Icons.pause_circle,
-              //         size: 50,
-              //       )
-              //     : SizedBox.shrink()
             ],
           ),
         ),
