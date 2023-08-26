@@ -87,8 +87,13 @@ class ChapterDownloadController extends ChangeNotifier {
   Future<void> deleteAllChapter({
     required List<ChapterStatus> chapters,
   }) async {
+    if (mangaDownload!.chapters.isEmpty) {
+      await repository.delete(uniqueid: mangaDownload!.uniqueid);
+      _serviceDownload.notifyListeners();
+      return;
+    }
     for (var chapter in chapters) {
-       _serviceDownload.deleteChapter(
+      await _serviceDownload.deleteChapter(
         chapter.chapter,
         chapter.uniqueid,
       );
