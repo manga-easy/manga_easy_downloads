@@ -153,7 +153,10 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                           Navigator.pushNamed(
                             context,
                             '/chapter',
-                            arguments: ct.mangaDownload!.manga,
+                            arguments: {
+                              'manga': ct.mangaDownload!.manga,
+                              'chapter': chapter,
+                            },
                           );
                         },
                         child: ContainerChapterDownload(
