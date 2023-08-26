@@ -1,6 +1,7 @@
 import 'package:coffee_cup/coffe_cup.dart';
 import 'package:flutter/material.dart';
 import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
+import 'package:manga_easy_downloads/src/features/presenter/ui/pages/chapters_download_page.dart';
 import 'package:manga_easy_sdk/manga_easy_sdk.dart';
 import 'package:manga_easy_themes/manga_easy_themes.dart';
 
@@ -20,7 +21,7 @@ class ContainerMangaDownload extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(
         context,
-        '/chapters-download',
+        ChapterDownloadPage.route,
         arguments: mangaDownload,
       ),
       child: CoffeeContainer(
