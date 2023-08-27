@@ -177,15 +177,17 @@ class DownloadController extends ChangeNotifier {
     int totalSize = 0;
     try {
       for (var chapter in chapters) {
-        var dir = Directory(chapter.path!);
-        if (dir.existsSync()) {
-          dir
-              .listSync(recursive: true, followLinks: false)
-              .forEach((FileSystemEntity entity) {
-            if (entity is File) {
-              totalSize += entity.lengthSync();
-            }
-          });
+        if (chapter.status == Status.done || chapter.status == Status.done) {
+          var dir = Directory(chapter.path!);
+          if (dir.existsSync()) {
+            dir
+                .listSync(recursive: true, followLinks: false)
+                .forEach((FileSystemEntity entity) {
+              if (entity is File) {
+                totalSize += entity.lengthSync();
+              }
+            });
+          }
         }
       }
     } catch (e) {
@@ -211,7 +213,7 @@ class DownloadController extends ChangeNotifier {
   Future<void> deleteAllDownload() async {
     for (var downloadMangas in listMangaDownload) {
       for (var chapter in downloadMangas.chapters) {
-        _service.deleteChapter(chapter.chapter, chapter.uniqueid);
+        await _service.deleteChapter(chapter.chapter, chapter.uniqueid);
       }
     }
     notifyListeners();

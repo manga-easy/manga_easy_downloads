@@ -200,6 +200,7 @@ class ServiceDownload extends ChangeNotifier {
       uniqueid: uniqueid,
     );
     if (result != null) {
+      removeChapterFromQueue(chapter, uniqueid);
       final index = result.chapters.indexWhere(
         (element) => element.chapter.title == chapter.title,
       );

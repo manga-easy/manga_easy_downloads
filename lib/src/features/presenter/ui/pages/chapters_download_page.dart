@@ -160,11 +160,14 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                           pages: '${chapter.imagens.length}',
                           icons: [
                             CoffeeIconButton(
-                              onTap: () {
-                                ct.deleteOneChapter(
+                              onTap: () async {
+                                await ct.deleteOneChapter(
                                   chapter: ct.listChaptersDone[idx].chapter,
                                   uniqueId: ct.listChaptersDone[idx].uniqueid,
                                 );
+                                if (ct.mangaDownload!.chapters.length == 1) {
+                                  Navigator.pop(context);
+                                }
                               },
                               icon: Icons.delete_outline_sharp,
                             ),
