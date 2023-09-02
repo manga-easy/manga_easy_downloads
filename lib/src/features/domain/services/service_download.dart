@@ -114,6 +114,11 @@ class ServiceDownload extends ChangeNotifier {
     final images = await _mangaRepository.getContentChapter(
       manga: chapterStatus.chapter.href,
       idHost: idhost,
+      cache: CacheHost(
+        uniqueid: chapterStatus.uniqueid,
+        chapter: chapterStatus.chapter.title,
+        idhost: idhost,
+      ),
     );
     final chapterImage = chapterStatus.chapter.copyWith(imagens: images);
     await _saveChapter(
