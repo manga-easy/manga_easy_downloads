@@ -195,8 +195,15 @@ class DownloadController extends ChangeNotifier {
     }
     var totalKbytes = (totalSize / 1024).floor();
     var totalMegaByte = (totalSize / (1024 * 1024)).floor();
+    var totalGigaByte = (totalSize / (1024 * 1024 * 1024)).toStringAsFixed(1);
 
-    return totalKbytes > 1000 ? '$totalMegaByte MB' : '$totalKbytes kB';
+    if (totalKbytes < 1000) {
+      return '$totalKbytes kB';
+    }
+    if (totalKbytes > 1000 && totalMegaByte < 1000) {
+      return '$totalMegaByte MB';
+    }
+    return '$totalGigaByte GB';
   }
 
   double get progressDownload => _service.downloadProgress;
