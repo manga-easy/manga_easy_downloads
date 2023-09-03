@@ -55,12 +55,12 @@ class ServiceDownload extends ChangeNotifier {
   // Adiciona um URL à fila de downloads
   Future<void> enqueueDownload(Chapter chapter, String uniqueid) async {
     await loadingPath();
-    if (!isChapterInQueue(chapter, uniqueid)) {
+    if (!isChapterInQueue(chapter, uniqueid) && _path != null) {
       final chapterStatus = ChapterStatus(
         chapter: chapter,
         status: Status.todo,
         uniqueid: uniqueid,
-        path: _path!,
+        path: _path,
       );
       _saveChapter(chapter: chapterStatus);
       _downloadQueue.add(chapterStatus);
@@ -102,9 +102,23 @@ class ServiceDownload extends ChangeNotifier {
     List<ImageChapter> auxImage = [];
     final pathChapter = '$_path/manga-easy/${chapterStatus.uniqueid}/'
         '${chapterStatus.chapter.number}';
+    final idhost = await _idHostByChapter(chapterStatus.uniqueid);
+    if (idhost == null) {
+      await _saveChapter(
+        chapter: chapterStatus.copyWith(
+          status: Status.error,
+        ),
+      );
+      return;
+    }
     final images = await _mangaRepository.getContentChapter(
       manga: chapterStatus.chapter.href,
-      idHost: await _idHostByChapter(chapterStatus.uniqueid),
+      idHost: idhost,
+      cache: CacheHost(
+        uniqueid: chapterStatus.uniqueid,
+        chapter: chapterStatus.chapter.title,
+        idhost: idhost,
+      ),
     );
     final chapterImage = chapterStatus.chapter.copyWith(imagens: images);
     await _saveChapter(
@@ -204,6 +218,9 @@ class ServiceDownload extends ChangeNotifier {
       final index = result.chapters.indexWhere(
         (element) => element.chapter.title == chapter.title,
       );
+      if (index == -1) {
+        return;
+      }
       final chapterStatus = result.chapters.elementAt(index);
       try {
         final dir = Directory(
@@ -228,11 +245,11 @@ class ServiceDownload extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<int> _idHostByChapter(String uniqueid) async {
+  Future<int?> _idHostByChapter(String uniqueid) async {
     final result = await _downloadRepository.get(
       uniqueid: uniqueid,
     );
-    return result!.manga.idHost;
+    return result?.manga.idHost;
   }
 
   Future<Directory> createDir(String pathChapter) async {
