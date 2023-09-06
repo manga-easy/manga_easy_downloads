@@ -10,14 +10,15 @@ class CustomAppBar extends StatefulWidget {
   final TextInputType? keyboardType;
   final void Function() cleanSearch;
 
-  const CustomAppBar(
-      {super.key,
-      required this.title,
-      required this.listPopMenu,
-      required this.textController,
-      required this.onChanged,
-      this.keyboardType,
-      required this.cleanSearch});
+  const CustomAppBar({
+    super.key,
+    required this.title,
+    required this.listPopMenu,
+    required this.textController,
+    required this.onChanged,
+    this.keyboardType,
+    required this.cleanSearch,
+  });
 
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
@@ -68,11 +69,12 @@ class _CustomAppBarState extends State<CustomAppBar> {
                 },
               ),
         PopupMenuButton(
-            icon: Icon(
-              Icons.more_vert,
-              color: ThemeService.of.backgroundIcon,
-            ),
-            itemBuilder: (context) => widget.listPopMenu)
+          icon: Icon(
+            Icons.more_vert,
+            color: ThemeService.of.backgroundIcon,
+          ),
+          itemBuilder: (context) => widget.listPopMenu,
+        ),
       ],
     );
   }

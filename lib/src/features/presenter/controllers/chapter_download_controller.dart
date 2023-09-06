@@ -113,6 +113,10 @@ class ChapterDownloadController extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> downloadChapter(Chapter chapter, String uniqueid) async {
+    _serviceDownload.enqueueDownload(chapter.copyWith(), uniqueid);
+  }
+
   void removeChapterQueue(Chapter chapter) {
     _serviceDownload.removeChapterFromQueue(chapter, mangaDownload!.uniqueid);
   }
