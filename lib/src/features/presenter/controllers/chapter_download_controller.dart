@@ -128,4 +128,6 @@ class ChapterDownloadController extends ChangeNotifier {
 
   bool isChapterInQueue(Chapter chapter) =>
       _serviceDownload.isChapterInQueue(chapter, mangaDownload!.uniqueid);
+
+  bool isPauseChapter(ChapterStatus chapter) => chapter.status == Status.paused;
 }

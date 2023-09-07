@@ -6,15 +6,17 @@ import 'package:manga_easy_themes/manga_easy_themes.dart';
 
 class ChapterDownloadStatus extends StatelessWidget {
   final ChapterDownloadController ct;
-  final Chapter chapter;
+  final ChapterStatus chapterStatus;
   final String uniqueid;
 
   const ChapterDownloadStatus({
     super.key,
     required this.ct,
-    required this.chapter,
+    required this.chapterStatus,
     required this.uniqueid,
   });
+
+  Chapter get chapter => chapterStatus.chapter;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,21 @@ class ChapterDownloadStatus extends StatelessWidget {
           ct.removeChapterQueue(chapter);
         },
         icon: Icons.stop_circle_outlined,
+      );
+    }
+    if (ct.isPauseChapter(chapterStatus)) {
+      return CoffeeIconButton(
+        icon: Icons.play_circle_filled_sharp,
+        size: 30,
+        onTap: () {
+          final snackBar = SnackBar(
+            backgroundColor: ThemeService.of.selectColor,
+            content: CoffeeText(
+              text: 'Só pode da play na tela inicial de downloads',
+            ),
+          );
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        },
       );
     }
     return CoffeeIconButton(
@@ -67,7 +84,7 @@ class ChapterDownloadStatus extends StatelessWidget {
             ),
           ],
         ),
-      ),
+      ).show(context),
     );
   }
 }

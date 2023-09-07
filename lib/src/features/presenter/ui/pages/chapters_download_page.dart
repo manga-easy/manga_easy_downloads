@@ -114,7 +114,7 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
                           pages: '${chapter.chapter.imagens.length}',
                           icons: [
                             ChapterDownloadStatus(
-                              chapter: chapter.chapter,
+                              chapterStatus: chapter,
                               uniqueid: chapter.uniqueid,
                               ct: ct,
                             ),
