@@ -22,7 +22,6 @@ class DownloadController extends ChangeNotifier {
   );
 
   bool isPausedAll = false;
-  bool isPaused = false;
   int chaptersContDone = 0;
   List<DownloadEntity> listMangaDownload = [];
   TextEditingController searchController = TextEditingController();
@@ -134,6 +133,18 @@ class DownloadController extends ChangeNotifier {
 
   Future<void> savePauseAllPref() async {
     isPausedAll = !isPausedAll;
+    print(isPausedAll);
+    if (isPausedAll) {
+      for (DownloadEntity manga in listTodo) {
+        await _service.pauseMangaDownload(manga.uniqueid);
+        print('Continuar manga');
+      }
+    } else {
+      for (DownloadEntity manga in listTodo) {
+        print('Pausar manga');
+        await _service.continueMangaDownload(manga);
+      }
+    }
     await _servicePrefs.put(
       keyPreferences: KeyPreferences.downloadPauseAll,
       value: isPausedAll,

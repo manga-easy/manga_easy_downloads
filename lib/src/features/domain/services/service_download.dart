@@ -25,7 +25,6 @@ class ServiceDownload extends ChangeNotifier {
   bool isDownloading = false;
   double downloadProgress = 0.0;
   String? _path;
-
   ChapterStatus? _currentChapter;
 
   Future<void> starting() async {
@@ -81,6 +80,33 @@ class ServiceDownload extends ChangeNotifier {
       _downloadQueue.add(chapterStatus);
     }
     _downloadNext();
+    notifyListeners();
+  }
+
+  Future<void> pauseMangaDownload(String uniqueid) async {
+    List<ChapterStatus> downloadChapters =
+        _downloadQueue.where((e) => e.uniqueid == uniqueid).toList();
+    for (var chapter in downloadChapters) {
+      if (chapter.status == Status.todo || chapter.status == Status.doing) {
+        await _saveChapter(
+          chapter: chapter.copyWith(status: Status.paused),
+        );
+      }
+    }
+
+    _downloadQueue.removeWhere((e) => e.uniqueid == uniqueid);
+    notifyListeners();
+  }
+
+  Future<void> continueMangaDownload(DownloadEntity downloadEntity) async {
+    for (var chapter in downloadEntity.chapters) {
+      if (chapter.status == Status.paused) {
+        await _saveChapter(
+          chapter: chapter.copyWith(status: Status.todo),
+        );
+      }
+    }
+    starting();
     notifyListeners();
   }
 
@@ -197,10 +223,6 @@ class ServiceDownload extends ChangeNotifier {
       ),
     );
     removeChapterFromQueue(chapter, chapterStatus.uniqueid);
-  }
-
-  void pauseDownload() {
-    //cancelToken.cancel();
   }
 
   Future<void> _saveChapter({

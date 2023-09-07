@@ -4,6 +4,7 @@ import 'package:get_it/get_it.dart';
 import 'package:manga_easy_downloads/src/features/presenter/controllers/download_controller.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/atoms/custom_app_bar.dart';
 import 'package:manga_easy_downloads/src/features/presenter/ui/organisms/list_mangas.dart';
+import 'package:manga_easy_themes/manga_easy_themes.dart';
 
 class DownloadPage extends StatefulWidget {
   static const route = '/downloads-v2';
@@ -61,23 +62,23 @@ class _DownloadPageState extends State<DownloadPage> {
           ],
         ),
       ),
-      // floatingActionButton: FloatingActionButton(
-      //   backgroundColor: ThemeService.of.backgroundIcon,
-      //   onPressed: () {
-      //     setState(() {
-      //       ct.savePauseAllPref();
-      //     });
-      //   },
-      //   child: ct.isPausedAll
-      //       ? const Icon(
-      //           Icons.play_arrow,
-      //           size: 30,
-      //         )
-      //       : const Icon(
-      //           Icons.pause,
-      //           size: 30,
-      //         ),
-      // ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: ThemeService.of.backgroundIcon,
+        onPressed: () {
+          setState(() {
+            ct.savePauseAllPref();
+          });
+        },
+        child: ct.isPausedAll
+            ? const Icon(
+                Icons.play_arrow,
+                size: 30,
+              )
+            : const Icon(
+                Icons.pause,
+                size: 30,
+              ),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         child: CustomScrollView(
