@@ -28,6 +28,21 @@ class ServiceDownload extends ChangeNotifier {
 
   ChapterStatus? _currentChapter;
 
+  Future<void> starting() async {
+    try {
+      final downloads = await _downloadRepository.list();
+      for (var download in downloads) {
+        for (var element in download.chapters) {
+          if (element.status == Status.doing || element.status == Status.todo) {
+            await enqueueDownload(element.chapter, element.uniqueid);
+          }
+        }
+      }
+    } on Exception catch (e) {
+      Helps.log(e);
+    }
+  }
+
   bool isCurrentChapter(Chapter chapter, String uniqueid) {
     final current = _currentChapter;
     if (current == null) {
