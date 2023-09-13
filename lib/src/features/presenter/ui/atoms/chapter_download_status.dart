@@ -42,13 +42,7 @@ class ChapterDownloadStatus extends StatelessWidget {
         icon: Icons.play_circle_filled_sharp,
         size: 30,
         onTap: () {
-          final snackBar = SnackBar(
-            backgroundColor: ThemeService.of.selectColor,
-            content: CoffeeText(
-              text: 'Só pode da play na tela inicial de downloads',
-            ),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          ct.downloadChapter(chapter, uniqueid);
         },
       );
     }

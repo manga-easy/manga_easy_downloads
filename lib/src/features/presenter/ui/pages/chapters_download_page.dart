@@ -58,6 +58,18 @@ class _ChapterDownloadPageState extends State<ChapterDownloadPage> {
               },
               child: const CoffeeText(text: 'Limpar todos os downloads'),
             ),
+            PopupMenuItem(
+              onTap: () {
+                ct.pauseAllChapter(ct.mangaDownload!.uniqueid);
+              },
+              child: const CoffeeText(text: 'Pausar todos os downloads'),
+            ),
+            PopupMenuItem(
+              onTap: () {
+                ct.continueAllChapters();
+              },
+              child: const CoffeeText(text: 'Continuar todos os downloads'),
+            ),
           ],
         ),
       ),

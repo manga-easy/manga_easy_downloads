@@ -130,4 +130,11 @@ class ChapterDownloadController extends ChangeNotifier {
       _serviceDownload.isChapterInQueue(chapter, mangaDownload!.uniqueid);
 
   bool isPauseChapter(ChapterStatus chapter) => chapter.status == Status.paused;
+
+  Future<void> pauseAllChapter(String uniqueid) async {
+    await _serviceDownload.pauseMangaDownload(uniqueid);
+  }
+  Future<void> continueAllChapters() async {
+    await _serviceDownload.continueMangaDownload(mangaDownload!);
+  }
 }
