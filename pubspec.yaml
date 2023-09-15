@@ -1,6 +1,6 @@
 name: manga_easy_downloads
 description: Micro app de downloads do manga easy.
-version: 0.0.1
+version: 2.0.1
 homepage: none
 publish_to: none
 
@@ -11,16 +11,21 @@ dependencies:
   flutter:
     sdk: flutter
   manga_easy_sdk:
-    path: ../manga_easy_sdk
-
+    git:
+      url: https://github.com/manga-easy/manga_easy_sdk.git
+      ref: v1.6.1
   coffee_cup:
-    path: ../manga_easy_coffee_cup
+    git:
+      url: https://github.com/manga-easy/manga_easy_coffee_cup.git
+      ref: v1.4.0
   hosts:
-    path: ../lib_hosts
+    git: 
+      url: https://github.com/manga-easy/lib_hosts.git
+      ref: v1.2.0
   client_driver:
     git:
       url: https://github.com/manga-easy/manga_easy_client_driver.git
-      ref: v1.2.0
+      ref: v1.2.3
   manga_easy_themes:
     git:
       url: https://github.com/manga-easy/manga_easy_themes.git
@@ -30,23 +35,16 @@ dependencies:
       url: https://github.com/manga-easy/manga_easy_routes.git
       ref: v1.0.2
   persistent_database:
-    path: ../lib_persistent_database
-  # manga_easy_hosts:
-  #   git:
-  #     url: https://github.com/manga-easy/manga_easy_hosts.git
-  #     ref: v1.0.5
-  
+    git: 
+      url: https://github.com/manga-easy/lib_persistent_database.git
+      ref: v1.3.0  
   get_it: ^7.2.0
   reorderables: ^0.6.0
   file_picker: ^5.3.2
   flutter_image_compress: ^2.0.3
   permission_handler: ^10.3.0
   dio: ^5.3.0
-dependency_overrides: 
-  manga_easy_sdk:
-    path: ../manga_easy_sdk
-  client_driver:
-    path: ../manga_easy_client_driver
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
