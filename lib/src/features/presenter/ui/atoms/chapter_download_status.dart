@@ -49,7 +49,12 @@ class ChapterDownloadStatus extends StatelessWidget {
     return CoffeeIconButton(
       icon: Icons.error,
       onTap: () => CoffeeSheetBottom(
-        button: CoffeeButton(label: 'voltar'),
+        button: CoffeeButton(
+          label: 'voltar',
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         title: CoffeeText(
           text: 'Gerenciar download',
           typography: CoffeeTypography.title,
