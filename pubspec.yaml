@@ -1,6 +1,6 @@
 name: manga_easy_downloads
 description: Micro app de downloads do manga easy.
-version: 2.0.1
+version: 2.0.2
 homepage: none
 publish_to: none
 
@@ -44,7 +44,20 @@ dependencies:
   flutter_image_compress: ^2.0.3
   permission_handler: ^10.3.0
   dio: ^5.3.0
-
+dependency_overrides: 
+  manga_easy_sdk:
+    git:
+      url: https://github.com/manga-easy/manga_easy_sdk.git
+      ref: v1.6.1
+  persistent_database:
+    git: 
+      url: https://github.com/manga-easy/lib_persistent_database.git
+      ref: v1.3.0
+  client_driver:
+    git:
+      url: https://github.com/manga-easy/manga_easy_client_driver.git
+      ref: v1.2.3
+  http: ^1.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
